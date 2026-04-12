@@ -1,0 +1,31 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "local-dev",
+      "displayName": "Local Development (E:\DSP-GPU\)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "FETCHCONTENT_SOURCE_DIR_DSPCORE":             "E:/DSP-GPU/core",
+        "FETCHCONTENT_SOURCE_DIR_DSPSPECTRUM":         "E:/DSP-GPU/spectrum",
+        "FETCHCONTENT_SOURCE_DIR_DSPSTATS":            "E:/DSP-GPU/stats",
+        "FETCHCONTENT_SOURCE_DIR_DSPSIGNALGENERATORS": "E:/DSP-GPU/signal_generators",
+        "FETCHCONTENT_SOURCE_DIR_DSPHETERODYNE":       "E:/DSP-GPU/heterodyne",
+        "FETCHCONTENT_SOURCE_DIR_DSPLINALG":           "E:/DSP-GPU/linalg",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "ci",
+      "displayName": "CI Build (tags from DSP_*_TAG)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "local-dev", "configurePreset": "local-dev" },
+    { "name": "ci",        "configurePreset": "ci" }
+  ]
+}

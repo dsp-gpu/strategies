@@ -1,0 +1,13 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(DspCore             REQUIRED)
+find_dependency(DspSpectrum         REQUIRED)
+find_dependency(DspStats            REQUIRED)
+find_dependency(DspSignalGenerators REQUIRED)
+find_dependency(DspHeterodyne       REQUIRED)
+find_dependency(DspLinalg           REQUIRED)
+find_dependency(hip                 REQUIRED)
+
+include("${CMAKE_CURRENT_LIST_DIR}/DspStrategiesTargets.cmake")
+check_required_components(DspStrategies)
