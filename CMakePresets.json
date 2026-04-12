@@ -3,7 +3,7 @@
   "configurePresets": [
     {
       "name": "local-dev",
-      "displayName": "Local Development (E:\DSP-GPU\)",
+      "displayName": "Local Development (E:\\DSP-GPU\\)",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
@@ -17,6 +17,22 @@
       }
     },
     {
+      "name": "debian-local-dev",
+      "displayName": "Debian Local (ROCm, ~/dsp-gpu/)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_PREFIX_PATH": "/opt/rocm",
+        "FETCHCONTENT_SOURCE_DIR_DSPCORE":             "${sourceDir}/../core",
+        "FETCHCONTENT_SOURCE_DIR_DSPSPECTRUM":         "${sourceDir}/../spectrum",
+        "FETCHCONTENT_SOURCE_DIR_DSPSTATS":            "${sourceDir}/../stats",
+        "FETCHCONTENT_SOURCE_DIR_DSPSIGNALGENERATORS": "${sourceDir}/../signal_generators",
+        "FETCHCONTENT_SOURCE_DIR_DSPHETERODYNE":       "${sourceDir}/../heterodyne",
+        "FETCHCONTENT_SOURCE_DIR_DSPLINALG":           "${sourceDir}/../linalg"
+      }
+    },
+    {
       "name": "ci",
       "displayName": "CI Build (tags from DSP_*_TAG)",
       "generator": "Ninja",
@@ -25,7 +41,8 @@
     }
   ],
   "buildPresets": [
-    { "name": "local-dev", "configurePreset": "local-dev" },
-    { "name": "ci",        "configurePreset": "ci" }
+    { "name": "local-dev",        "configurePreset": "local-dev"        },
+    { "name": "debian-local-dev", "configurePreset": "debian-local-dev" },
+    { "name": "ci",               "configurePreset": "ci"               }
   ]
 }
