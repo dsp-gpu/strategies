@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
-project(DspStrategies VERSION 0.1.0 LANGUAGES CXX HIP)
+project(DspStrategies VERSION 0.1.0
+  DESCRIPTION "Antenna array processing pipelines"
+  LANGUAGES CXX HIP)
 
 # ── Опции ──────────────────────────────────────────────────────────
 option(DSP_STRATEGIES_BUILD_TESTS  "Build tests"            ON)

@@ -13,7 +13,8 @@
         "FETCHCONTENT_SOURCE_DIR_DSPSIGNALGENERATORS": "E:/DSP-GPU/signal_generators",
         "FETCHCONTENT_SOURCE_DIR_DSPHETERODYNE":       "E:/DSP-GPU/heterodyne",
         "FETCHCONTENT_SOURCE_DIR_DSPLINALG":           "E:/DSP-GPU/linalg",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
     {
@@ -29,7 +30,8 @@
         "FETCHCONTENT_SOURCE_DIR_DSPSTATS":            "${sourceDir}/../stats",
         "FETCHCONTENT_SOURCE_DIR_DSPSIGNALGENERATORS": "${sourceDir}/../signal_generators",
         "FETCHCONTENT_SOURCE_DIR_DSPHETERODYNE":       "${sourceDir}/../heterodyne",
-        "FETCHCONTENT_SOURCE_DIR_DSPLINALG":           "${sourceDir}/../linalg"
+        "FETCHCONTENT_SOURCE_DIR_DSPLINALG":           "${sourceDir}/../linalg",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
     {
@@ -44,5 +46,10 @@
     { "name": "local-dev",        "configurePreset": "local-dev"        },
     { "name": "debian-local-dev", "configurePreset": "debian-local-dev" },
     { "name": "ci",               "configurePreset": "ci"               }
+  ],
+  "testPresets": [
+    { "name": "local-dev",        "configurePreset": "local-dev",        "output": { "outputOnFailure": true } },
+    { "name": "debian-local-dev", "configurePreset": "debian-local-dev", "output": { "outputOnFailure": true } },
+    { "name": "ci",               "configurePreset": "ci",               "output": { "outputOnFailure": true } }
   ]
 }
