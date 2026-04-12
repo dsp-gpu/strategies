@@ -21,7 +21,8 @@ add_library(DspStrategies STATIC)
 add_library(DspStrategies::DspStrategies ALIAS DspStrategies)
 
 target_sources(DspStrategies PRIVATE
-  # Phase 1 skeleton — sources added in Phase 2
+  src/strategies/src/antenna_processor_v1.cpp
+  src/strategies/src/weight_generator.cpp
 )
 
 target_include_directories(DspStrategies
@@ -29,6 +30,7 @@ target_include_directories(DspStrategies
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
   PRIVATE
+    src/strategies/include
     kernels/
     src
 )
