@@ -30,6 +30,7 @@ target_sources(DspStrategies PRIVATE
 target_include_directories(DspStrategies
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
     $<INSTALL_INTERFACE:include>
   PRIVATE
     src/strategies/include
@@ -47,12 +48,36 @@ target_link_libraries(DspStrategies
 )
 target_compile_features(DspStrategies PUBLIC cxx_std_17)
 
+# ── Git Version ────────────────────────────────────────────────────
+find_package(Git QUIET)
+if(NOT GIT_EXECUTABLE)
+    set(GIT_EXECUTABLE git)
+endif()
+
+add_custom_target(git_version_DspStrategies ALL
+    COMMAND ${CMAKE_COMMAND}
+        -D SRC_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+        -D BIN_DIR=${CMAKE_CURRENT_BINARY_DIR}
+        -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+        -D MODULE_PREFIX=DSPSTRATEGIES
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.cmake
+    COMMENT "[DspStrategies] Checking git version..."
+    VERBATIM
+)
+add_dependencies(DspStrategies git_version_DspStrategies)
+
 # ── Install + Export ────────────────────────────────────────────────
 include(GNUInstallDirs)
 install(TARGETS DspStrategies EXPORT DspStrategiesTargets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/version.h"
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/DspStrategies
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/version.json"
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/DspStrategies
+)
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(cmake/DspStrategiesConfig.cmake.in
