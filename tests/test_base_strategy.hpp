@@ -18,8 +18,8 @@
 #include "signal_strategy_factory.hpp"
 #include "antenna_test_params.hpp"
 
-#include "interface/i_backend.hpp"
-#include "services/console_output.hpp"
+#include <core/interface/i_backend.hpp>
+#include <core/services/console_output.hpp>
 
 #include <vector>
 #include <memory>

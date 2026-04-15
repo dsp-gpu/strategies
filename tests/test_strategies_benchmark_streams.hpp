@@ -19,8 +19,8 @@
 
 #if ENABLE_ROCM
 
-#include "antenna_processor_test.hpp"
-#include "services/console_output.hpp"
+#include <strategies/antenna_processor_test.hpp>
+#include <core/services/console_output.hpp>
 
 #include <hip/hip_runtime.h>
 #include <chrono>

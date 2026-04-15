@@ -22,14 +22,15 @@
 #if ENABLE_ROCM
 
 #include "strategy_test_base.hpp"
-#include "antenna_processor_test.hpp"
+#include <strategies/antenna_processor_test.hpp>
 #include "signal_strategy_factory.hpp"
 
-#include "services/gpu_profiler.hpp"
-#include "services/console_output.hpp"
-#include "interface/i_backend.hpp"
+#include <core/services/gpu_profiler.hpp>
+#include <core/services/console_output.hpp>
+#include <core/interface/i_backend.hpp>
 
 #include <hip/hip_runtime.h>
+#include <core/services/scoped_hip_event.hpp>
 #include <functional>
 #include <chrono>
 #include <algorithm>
@@ -128,9 +129,9 @@ protected:
       }
 
       // Замер
-      hipEvent_t ev_start, ev_stop;
-      hipEventCreate(&ev_start);
-      hipEventCreate(&ev_stop);
+      drv_gpu_lib::ScopedHipEvent ev_start, ev_stop;
+      ev_start.Create();
+      ev_stop.Create();
 
       using SClock = std::chrono::steady_clock;
       using NS     = std::chrono::nanoseconds;
@@ -138,14 +139,14 @@ protected:
       for (int r = 0; r < prof_cfg_.n_runs; ++r) {
         hipDeviceSynchronize();
         auto t0 = SClock::now();
-        hipEventRecord(ev_start, nullptr);
+        hipEventRecord(ev_start.get(), nullptr);
         step();
-        hipEventRecord(ev_stop, nullptr);
-        hipEventSynchronize(ev_stop);
+        hipEventRecord(ev_stop.get(), nullptr);
+        hipEventSynchronize(ev_stop.get());
         auto t1 = SClock::now();
 
         float ms = 0.0f;
-        hipEventElapsedTime(&ms, ev_start, ev_stop);
+        hipEventElapsedTime(&ms, ev_start.get(), ev_stop.get());
 
         uint64_t ns_exec = static_cast<uint64_t>(ms * 1.0e6f);
         uint64_t ns_wall = static_cast<uint64_t>(
@@ -162,8 +163,8 @@ protected:
         profiler.Record(g, "Strategies", name, pd);
       }
 
-      hipEventDestroy(ev_start);
-      hipEventDestroy(ev_stop);
+      
+      
       con.Print(g, "ProfBench", ("  measured: " + name).c_str());
     };
 

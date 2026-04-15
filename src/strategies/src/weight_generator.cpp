@@ -1,5 +1,5 @@
-#include "weight_generator.hpp"
-#include "interface/i_backend.hpp"
+#include <strategies/weight_generator.hpp>
+#include <core/interface/i_backend.hpp>
 
 #include <cmath>
 

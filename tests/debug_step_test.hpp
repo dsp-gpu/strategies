@@ -29,10 +29,10 @@
 #if ENABLE_ROCM
 
 #include "strategy_test_base.hpp"
-#include "antenna_processor_test.hpp"
-#include "result_types.hpp"
+#include <strategies/antenna_processor_test.hpp>
+#include <strategies/result_types.hpp>
 
-#include "services/console_output.hpp"
+#include <core/services/console_output.hpp>
 
 #include <hip/hip_runtime.h>
 #include <fstream>

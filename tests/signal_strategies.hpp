@@ -25,7 +25,7 @@
 #include "params/form_params.hpp"
 #include "lch_farrow_rocm.hpp"
 
-#include "interface/i_backend.hpp"
+#include <core/interface/i_backend.hpp>
 
 #include <hip/hip_runtime.h>
 #include <vector>

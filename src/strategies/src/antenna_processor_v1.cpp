@@ -1,17 +1,22 @@
-#include "antenna_processor_v1.hpp"
-#include "interface/i_backend.hpp"
-#include "kernels/strategies_kernels_rocm.hpp"
+#include <strategies/antenna_processor_v1.hpp>
+#include <core/interface/i_backend.hpp>
+#include <strategies/kernels/strategies_kernels_rocm.hpp>
+#include <core/services/scoped_hip_event.hpp>
+using drv_gpu_lib::ScopedHipEvent;
+
 
 #if ENABLE_ROCM
-#include "statistics_processor.hpp"
-#include "pipelines/all_maxima_pipeline_rocm.hpp"
-#include "complex_to_mag_phase_rocm.hpp"
-#include "types/mag_phase_types.hpp"
-#include "services/console_output.hpp"
+#include <stats/statistics_processor.hpp>
+#include <spectrum/pipelines/all_maxima_pipeline_rocm.hpp>
+#include <spectrum/complex_to_mag_phase_rocm.hpp>
+#include <spectrum/types/mag_phase_types.hpp>
+#include <core/services/console_output.hpp>
 #include <stdexcept>
 #include <cmath>
 #include <cstring>
 #include <chrono>
+using drv_gpu_lib::ScopedHipEvent;
+
 
 #define HIP_CHECK(call) do { \
     hipError_t err = (call); \
@@ -61,10 +66,10 @@ AntennaProcessor_v1::AntennaProcessor_v1(
   HIP_CHECK(hipStreamCreate(&stream_bench3c_));
 
   // Create events (disable timing for lower overhead where not needed)
-  HIP_CHECK(hipEventCreateWithFlags(&event_gemm_done_, hipEventDisableTiming));
-  HIP_CHECK(hipEventCreateWithFlags(&event_fft_done_,  hipEventDisableTiming));
-  HIP_CHECK(hipEventCreateWithFlags(&event_c1_done_,   hipEventDisableTiming));
-  HIP_CHECK(hipEventCreateWithFlags(&event_c2_done_,   hipEventDisableTiming));
+  HIP_CHECK(event_gemm_done_.CreateWithFlags(hipEventDisableTiming));
+  HIP_CHECK(event_fft_done_.CreateWithFlags(hipEventDisableTiming));
+  HIP_CHECK(event_c1_done_.CreateWithFlags(hipEventDisableTiming));
+  HIP_CHECK(event_c2_done_.CreateWithFlags(hipEventDisableTiming));
 
   // Create hipBLAS handle, bind to main stream
   HIPBLAS_CHECK(hipblasCreate(&hipblas_handle_));
@@ -109,10 +114,10 @@ AntennaProcessor_v1::~AntennaProcessor_v1() {
 
   // GpuContext manages kernel module — no manual hipModuleUnload
 
-  if (event_gemm_done_) hipEventDestroy(event_gemm_done_);
-  if (event_fft_done_)  hipEventDestroy(event_fft_done_);
-  if (event_c1_done_)   hipEventDestroy(event_c1_done_);
-  if (event_c2_done_)   hipEventDestroy(event_c2_done_);
+  // event_gemm_done_ — RAII cleanup
+  // event_fft_done_ — RAII cleanup
+  // event_c1_done_ — RAII cleanup
+  // event_c2_done_ — RAII cleanup
 
   if (stream_main_)    hipStreamDestroy(stream_main_);
   if (stream_debug1_)  hipStreamDestroy(stream_debug1_);
@@ -264,27 +269,27 @@ AntennaResult AntennaProcessor_v1::process(const void* d_S, const void* d_W) {
 
   // --- Debug point 2.2: stats on d_X (Stream 3, parallel with Window+FFT) ---
   // Wait for GEMM to complete before reading d_X
-  HIP_CHECK(hipEventRecord(event_gemm_done_, stream_main_));
-  HIP_CHECK(hipStreamWaitEvent(stream_debug2_, event_gemm_done_, 0));
+  HIP_CHECK(hipEventRecord(event_gemm_done_.get(), stream_main_));
+  HIP_CHECK(hipStreamWaitEvent(stream_debug2_, event_gemm_done_.get(), 0));
   do_debug_point_22(result);
 
   // --- Window (Hamming) + FFT (Stream 2) ---
   do_window_fft();
 
   // --- Debug point 2.3: stats on |spectrum| (Stream 4) ---
-  HIP_CHECK(hipEventRecord(event_fft_done_, stream_main_));
-  HIP_CHECK(hipStreamWaitEvent(stream_debug3_, event_fft_done_, 0));
+  HIP_CHECK(hipEventRecord(event_fft_done_.get(), stream_main_));
+  HIP_CHECK(hipStreamWaitEvent(stream_debug3_, event_fft_done_.get(), 0));
   do_debug_point_23(result);
 
   // --- Post-FFT scenarios (Stream 4, after FFT done) ---
   do_run_post_fft_scenarios(result);
 
   // Synchronize all streams before building result
-  HIP_CHECK(hipEventRecord(event_c1_done_, stream_debug1_));
-  HIP_CHECK(hipEventRecord(event_c2_done_, stream_debug2_));
+  HIP_CHECK(hipEventRecord(event_c1_done_.get(), stream_debug1_));
+  HIP_CHECK(hipEventRecord(event_c2_done_.get(), stream_debug2_));
 
-  HIP_CHECK(hipEventSynchronize(event_c1_done_));
-  HIP_CHECK(hipEventSynchronize(event_c2_done_));
+  HIP_CHECK(hipEventSynchronize(event_c1_done_.get()));
+  HIP_CHECK(hipEventSynchronize(event_c2_done_.get()));
   HIP_CHECK(hipStreamSynchronize(stream_debug3_));
 
   auto t_end = std::chrono::high_resolution_clock::now();

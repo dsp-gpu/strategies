@@ -22,11 +22,12 @@
 #if ENABLE_ROCM
 
 #include "strategy_test_base.hpp"
-#include "antenna_processor_test.hpp"
+#include <strategies/antenna_processor_test.hpp>
 
-#include "services/console_output.hpp"
+#include <core/services/console_output.hpp>
 
 #include <hip/hip_runtime.h>
+#include <core/services/scoped_hip_event.hpp>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -197,25 +198,25 @@ private:
     using SClock = std::chrono::steady_clock;
     using MS     = std::chrono::duration<float, std::milli>;
 
-    hipEvent_t ev_start, ev_stop;
-    hipEventCreate(&ev_start);
-    hipEventCreate(&ev_stop);
+    drv_gpu_lib::ScopedHipEvent ev_start, ev_stop;
+    ev_start.Create();
+    ev_stop.Create();
 
     hipDeviceSynchronize();
     auto wall_start = SClock::now();
-    hipEventRecord(ev_start, nullptr);
+    hipEventRecord(ev_start.get(), nullptr);
 
     fn();
 
-    hipEventRecord(ev_stop, nullptr);
-    hipEventSynchronize(ev_stop);
+    hipEventRecord(ev_stop.get(), nullptr);
+    hipEventSynchronize(ev_stop.get());
     auto wall_end = SClock::now();
 
     float gpu_ms = 0.0f;
-    hipEventElapsedTime(&gpu_ms, ev_start, ev_stop);
+    hipEventElapsedTime(&gpu_ms, ev_start.get(), ev_stop.get());
 
-    hipEventDestroy(ev_start);
-    hipEventDestroy(ev_stop);
+    
+    
 
     StepTiming t;
     t.name    = name;

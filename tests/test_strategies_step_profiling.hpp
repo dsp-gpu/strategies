@@ -25,14 +25,15 @@
 #include <vector>
 
 #include <hip/hip_runtime.h>
+#include <core/services/scoped_hip_event.hpp>
 
-#include "antenna_processor_test.hpp"
-#include "weight_generator.hpp"
+#include <strategies/antenna_processor_test.hpp>
+#include <strategies/weight_generator.hpp>
 #include "generators/form_signal_generator_rocm.hpp"
 
-#include "services/console_output.hpp"
-#include "services/gpu_profiler.hpp"
-#include "backends/rocm/rocm_backend.hpp"
+#include <core/services/console_output.hpp>
+#include <core/services/gpu_profiler.hpp>
+#include <core/backends/rocm/rocm_backend.hpp>
 
 namespace test_strategies_profiling {
 
@@ -60,9 +61,9 @@ inline double MeasureStep(
     (void)hipDeviceSynchronize();
   }
 
-  hipEvent_t ev_start, ev_stop;
-  (void)hipEventCreate(&ev_start);
-  (void)hipEventCreate(&ev_stop);
+  drv_gpu_lib::ScopedHipEvent ev_start, ev_stop;
+  (void)ev_start.Create();
+  (void)ev_stop.Create();
 
   using SClock = std::chrono::steady_clock;
   using NS     = std::chrono::nanoseconds;
@@ -71,17 +72,17 @@ inline double MeasureStep(
     auto tq = SClock::now();
     (void)hipDeviceSynchronize();
     auto ts = SClock::now();
-    (void)hipEventRecord(ev_start, nullptr);
+    (void)hipEventRecord(ev_start.get(), nullptr);
     auto tk = SClock::now();
 
     fn();
 
-    (void)hipEventRecord(ev_stop, nullptr);
-    (void)hipEventSynchronize(ev_stop);
+    (void)hipEventRecord(ev_stop.get(), nullptr);
+    (void)hipEventSynchronize(ev_stop.get());
     auto tc = SClock::now();
 
     float ms = 0.0f;
-    (void)hipEventElapsedTime(&ms, ev_start, ev_stop);
+    (void)hipEventElapsedTime(&ms, ev_start.get(), ev_stop.get());
 
     uint64_t ns_queue    = static_cast<uint64_t>(
         std::chrono::duration_cast<NS>(ts - tq).count());
@@ -103,8 +104,8 @@ inline double MeasureStep(
     profiler.Record(gpu_id, "Strategies", step_name, pd);
   }
 
-  (void)hipEventDestroy(ev_start);
-  (void)hipEventDestroy(ev_stop);
+  (void)
+  (void)
 
   // Return avg exec time (last run's ms is approximate, profiler has details)
   return 0.0;  // GPUProfiler has all data

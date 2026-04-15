@@ -29,11 +29,11 @@
 #include "i_signal_strategy.hpp"
 #include "signal_strategy_factory.hpp"
 
-#include "config/antenna_processor_config.hpp"
-#include "weight_generator.hpp"
+#include <strategies/config/antenna_processor_config.hpp>
+#include <strategies/weight_generator.hpp>
 
-#include "interface/i_backend.hpp"
-#include "services/console_output.hpp"
+#include <core/interface/i_backend.hpp>
+#include <core/services/console_output.hpp>
 
 #include <hip/hip_runtime.h>
 #include <memory>

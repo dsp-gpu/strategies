@@ -19,10 +19,10 @@
  * @date 2026-03-07
  */
 
-#include "antenna_processor_test.hpp"
-#include "weight_generator.hpp"
-#include "config/antenna_processor_config.hpp"
-#include "result_types.hpp"
+#include <strategies/antenna_processor_test.hpp>
+#include <strategies/weight_generator.hpp>
+#include <strategies/config/antenna_processor_config.hpp>
+#include <strategies/result_types.hpp>
 
 #include <complex>
 #include <vector>

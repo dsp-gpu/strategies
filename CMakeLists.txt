@@ -29,11 +29,11 @@ target_sources(DspStrategies PRIVATE
 
 target_include_directories(DspStrategies
   PUBLIC
+    # Стандарт AMD: #include <strategies/steps/...>, <strategies/config/...>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
     $<INSTALL_INTERFACE:include>
   PRIVATE
-    src/strategies/include
     kernels/
     src
 )

@@ -24,8 +24,8 @@
 // #include "timing_per_step_test.hpp"             // включить отдельно если нужно
 
 #if ENABLE_ROCM
-#include "backends/rocm/rocm_backend.hpp"
-#include "services/console_output.hpp"
+#include <core/backends/rocm/rocm_backend.hpp>
+#include <core/services/console_output.hpp>
 #endif
 
 namespace strategies_all_test {

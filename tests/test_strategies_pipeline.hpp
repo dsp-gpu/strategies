@@ -19,11 +19,11 @@
 
 #if ENABLE_ROCM
 
-#include "antenna_processor_test.hpp"
-#include "weight_generator.hpp"
+#include <strategies/antenna_processor_test.hpp>
+#include <strategies/weight_generator.hpp>
 #include "generators/form_signal_generator_rocm.hpp"
 
-#include "services/console_output.hpp"
+#include <core/services/console_output.hpp>
 
 #include <cmath>
 #include <cassert>
