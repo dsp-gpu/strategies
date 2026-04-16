@@ -29,7 +29,7 @@
 
 #include <strategies/antenna_processor_test.hpp>
 #include <strategies/weight_generator.hpp>
-#include "generators/form_signal_generator_rocm.hpp"
+#include <signal_generators/generators/form_signal_generator_rocm.hpp>
 
 #include <core/services/console_output.hpp>
 #include <core/services/gpu_profiler.hpp>
@@ -103,9 +103,6 @@ inline double MeasureStep(
     pd.kernel_name = step_name;
     profiler.Record(gpu_id, "Strategies", step_name, pd);
   }
-
-  (void)
-  (void)
 
   // Return avg exec time (last run's ms is approximate, profiler has details)
   return 0.0;  // GPUProfiler has all data

@@ -7,8 +7,8 @@
  * Include AFTER ROCmGPUContext and vector_to_numpy definitions.
  *
  * Usage from Python:
- *   ctx = gpuworklib.ROCmGPUContext(0)
- *   proc = gpuworklib.AntennaProcessorTest(ctx, n_ant=5, n_samples=8000,
+ *   ctx = dsp_strategies.ROCmGPUContext(0)
+ *   proc = dsp_strategies.AntennaProcessorTest(ctx, n_ant=5, n_samples=8000,
  *              sample_rate=12e6, signal_frequency_hz=2e6)
  *   proc.step_0_prepare_input(d_S_array, W_array)
  *   gemm = proc.step_2_gemm()
@@ -347,8 +347,8 @@ inline void register_strategies_rocm(py::module_& m) {
       "Step-by-step antenna array processor (ROCm).\n\n"
       "Pipeline: GEMM -> Window+FFT -> post-FFT scenarios\n\n"
       "Usage:\n"
-      "  ctx = gpuworklib.ROCmGPUContext(0)\n"
-      "  proc = gpuworklib.AntennaProcessorTest(ctx, n_ant=5, n_samples=8000,\n"
+      "  ctx = dsp_strategies.ROCmGPUContext(0)\n"
+      "  proc = dsp_strategies.AntennaProcessorTest(ctx, n_ant=5, n_samples=8000,\n"
       "             sample_rate=12e6, signal_frequency_hz=2e6)\n"
       "  proc.step_0_prepare_input(signal, weights)\n"
       "  gemm = proc.step_2_gemm()\n"

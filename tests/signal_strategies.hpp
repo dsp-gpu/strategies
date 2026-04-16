@@ -21,9 +21,9 @@
 #include "i_signal_strategy.hpp"
 #include "antenna_test_params.hpp"
 
-#include "generators/form_signal_generator_rocm.hpp"
-#include "params/form_params.hpp"
-#include "lch_farrow_rocm.hpp"
+#include <signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <signal_generators/params/form_params.hpp>
+#include <spectrum/lch_farrow_rocm.hpp>
 
 #include <core/interface/i_backend.hpp>
 

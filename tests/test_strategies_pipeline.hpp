@@ -21,7 +21,7 @@
 
 #include <strategies/antenna_processor_test.hpp>
 #include <strategies/weight_generator.hpp>
-#include "generators/form_signal_generator_rocm.hpp"
+#include <signal_generators/generators/form_signal_generator_rocm.hpp>
 
 #include <core/services/console_output.hpp>
 

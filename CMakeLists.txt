@@ -8,7 +8,8 @@ option(DSP_STRATEGIES_BUILD_TESTS  "Build tests"            ON)
 option(DSP_STRATEGIES_BUILD_PYTHON "Build Python bindings"  OFF)
 
 # ── Зависимости ────────────────────────────────────────────────────
-find_package(hip REQUIRED)   # lowercase — Linux case-sensitive!
+find_package(hip    REQUIRED)   # lowercase — Linux case-sensitive!
+find_package(hipblas REQUIRED)  # для GEMM в GemmStep/AntennaProcessor
 
 include(cmake/fetch_deps.cmake)
 fetch_dsp_core()
@@ -21,6 +22,9 @@ fetch_dsp_linalg()
 # ── Библиотека ─────────────────────────────────────────────────────
 add_library(DspStrategies STATIC)
 add_library(DspStrategies::DspStrategies ALIAS DspStrategies)
+
+# PIC нужен для Python bindings (.so линкует static lib)
+set_target_properties(DspStrategies PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_sources(DspStrategies PRIVATE
   src/strategies/src/antenna_processor_v1.cpp
@@ -45,8 +49,15 @@ target_link_libraries(DspStrategies
     DspSignalGenerators::DspSignalGenerators
     DspHeterodyne::DspHeterodyne
     DspLinalg::DspLinalg
+    roc::hipblas
 )
 target_compile_features(DspStrategies PUBLIC cxx_std_17)
+
+if(ENABLE_ROCM)
+  target_compile_definitions(DspStrategies PUBLIC ENABLE_ROCM=1)
+  # ENABLE_ROCBLAS: linalg→core GpuContext::GetRocblasHandleRaw()
+  target_compile_definitions(DspCore PUBLIC ENABLE_ROCBLAS=1)
+endif()
 
 # ── Git Version ────────────────────────────────────────────────────
 find_package(Git QUIET)
