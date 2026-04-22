@@ -29,6 +29,7 @@ set_target_properties(DspStrategies PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_sources(DspStrategies PRIVATE
   src/strategies/src/antenna_processor_v1.cpp
   src/strategies/src/weight_generator.cpp
+  src/strategies/src/strategies_float_api.cpp
 )
 
 target_include_directories(DspStrategies
