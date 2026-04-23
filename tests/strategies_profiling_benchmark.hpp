@@ -4,19 +4,19 @@
  * @file strategies_profiling_benchmark.hpp
  * @brief StrategiesProfilingBenchmark — GPU profiling per Step (T3)
  *
- * Измеряет время каждого шага pipeline через hipEvent + GPUProfiler.
+ * Измеряет время каждого шага pipeline через hipEvent + ProfilingFacade v2.
  * Реализует паттерн GpuBenchmarkBase (Template Method) для ROCm.
  *
  * Прогоны:
  *   n_warmup прогревочных итераций (без записи)
- *   n_runs   замерных итераций → GPUProfiler::Record()
+ *   n_runs   замерных итераций → собираются в вектор и одним
+ *            ProfilingFacade::BatchRecord (W1: меньше contention,
+ *            чем N × Record, см. Round 3 review).
  *
- * Вывод ТОЛЬКО через GPUProfiler:
- *   profiler.PrintReport()
- *   profiler.ExportMarkdown("Results/Profiler/strategies/...")
- *   profiler.ExportJSON("Results/Profiler/strategies/...")
+ * Вывод через ProfilingFacade:
+ *   WaitEmpty() → ExportJsonAndMarkdown(<dir>/<name>.json|.md)
  *
- * @date 2026-03-15
+ * @date 2026-03-15 (migrated to ProfilingFacade v2: 2026-04-23, Phase D)
  */
 
 #if ENABLE_ROCM
@@ -25,7 +25,7 @@
 #include <strategies/antenna_processor_test.hpp>
 #include "signal_strategy_factory.hpp"
 
-#include <core/services/gpu_profiler.hpp>
+#include <core/services/profiling/profiling_facade.hpp>
 #include <core/services/console_output.hpp>
 #include <core/interface/i_backend.hpp>
 
@@ -80,9 +80,9 @@ public:
 
 protected:
   void Execute() override {
-    auto& con     = drv_gpu_lib::ConsoleOutput::GetInstance();
-    auto& profiler = drv_gpu_lib::GPUProfiler::GetInstance();
-    const int g   = 0;
+    auto& con      = drv_gpu_lib::ConsoleOutput::GetInstance();
+    auto& profiler = drv_gpu_lib::profiling::ProfilingFacade::GetInstance();
+    const int g    = 0;
 
     // ── Конфиг: disable debug stats во время профилирования ──────────────
     cfg_.debug_mode = false;
@@ -93,7 +93,7 @@ protected:
     strategies::AntennaProcessorTest proc(backend_, cfg_);
     proc.step_0_prepare_input(d_S_, d_W_);
 
-    // ── GPUProfiler setup ────────────────────────────────────────────────
+    // ── ProfilingFacade setup (order per rule 06) ────────────────────────
     auto dev = backend_->GetDeviceInfo();
     drv_gpu_lib::GPUReportInfo ri;
     ri.gpu_name      = dev.name;
@@ -103,9 +103,8 @@ protected:
     drv["driver_type"]    = "ROCm";
     drv["driver_version"] = dev.driver_version;
     ri.drivers.push_back(drv);
-    profiler.SetGPUInfo(g, ri);
-    profiler.Reset();
-    profiler.Start();
+    profiler.Enable(true);
+    profiler.SetGpuInfo(g, ri);
 
     char buf[256];
     std::snprintf(buf, sizeof(buf),
@@ -116,6 +115,8 @@ protected:
     con.Print(g, "ProfBench", buf);
 
     // ── Вспомогательная лямбда: прогрев + замер шага ─────────────────────
+    // n_runs событий собираются в локальный вектор и одним вызовом
+    // BatchRecord переливаются в ProfilingFacade (W1: меньше contention).
     auto measure = [&](const std::string& name,
                        std::function<void()> prepare,
                        std::function<void()> step) {
@@ -135,6 +136,9 @@ protected:
 
       using SClock = std::chrono::steady_clock;
       using NS     = std::chrono::nanoseconds;
+
+      std::vector<std::pair<std::string, drv_gpu_lib::ROCmProfilingData>> events;
+      events.reserve(prof_cfg_.n_runs);
 
       for (int r = 0; r < prof_cfg_.n_runs; ++r) {
         hipDeviceSynchronize();
@@ -160,11 +164,10 @@ protected:
         pd.end_ns      = ns_exec;
         pd.complete_ns = ns_exec + ns_overhead;
         pd.kernel_name = name;
-        profiler.Record(g, "Strategies", name, pd);
+        events.emplace_back(name, pd);
       }
 
-      
-      
+      profiler.BatchRecord(g, "strategies/pipeline", events);
       con.Print(g, "ProfBench", ("  measured: " + name).c_str());
     };
 
@@ -192,11 +195,12 @@ protected:
     measure("FullProcess", nullptr,
         [&]() { proc.process_full(); });
 
-    // ── Отчёт ТОЛЬКО через GPUProfiler ──────────────────────────────────
-    profiler.Stop();
+    // ── Отчёт через ProfilingFacade (rule 06: WaitEmpty → Export) ────────
+    profiler.WaitEmpty();
+    const std::string json_path = prof_cfg_.output_dir + "/strategies_profbench.json";
+    const std::string md_path   = prof_cfg_.output_dir + "/strategies_profbench.md";
+    profiler.ExportJsonAndMarkdown(json_path, md_path);
     profiler.PrintReport();
-    profiler.ExportMarkdown(prof_cfg_.output_dir);
-    profiler.ExportJSON(prof_cfg_.output_dir);
   }
 
   void Validate() override {

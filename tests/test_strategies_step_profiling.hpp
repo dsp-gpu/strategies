@@ -12,16 +12,17 @@
  *   step4 = GlobalMinMax (global_minmax kernel)
  *   step5 = Full process() — total pipeline wall-clock
  *
- * All timing via GPUProfiler.Record() → PrintReport().
- * Pattern: fm_correlator/test_fm_step_profiling.hpp
+ * All timing via ProfilingFacade::BatchRecord (one batch per step) → WaitEmpty
+ * + ExportJsonAndMarkdown (rule 06). Pattern: fm_correlator/test_fm_step_profiling.hpp
  *
- * @date 2026-03-07
+ * @date 2026-03-07 (migrated to ProfilingFacade v2: 2026-04-23, Phase D)
  */
 
 #include <algorithm>
 #include <chrono>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <hip/hip_runtime.h>
@@ -32,7 +33,7 @@
 #include <signal_generators/generators/form_signal_generator_rocm.hpp>
 
 #include <core/services/console_output.hpp>
-#include <core/services/gpu_profiler.hpp>
+#include <core/services/profiling/profiling_facade.hpp>
 #include <core/backends/rocm/rocm_backend.hpp>
 
 namespace test_strategies_profiling {
@@ -46,14 +47,15 @@ constexpr int      kProfWarmup     = 10;
 constexpr int      kProfRuns       = 20;
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Helper: measure one step via hipEvent, record to GPUProfiler
-// Returns average GPU time in ms
+// Helper: measure one step via hipEvent, feed all `runs` events to
+// ProfilingFacade via a single BatchRecord (W1: less queue contention than
+// N × Record). Returns 0 — the facade has all data.
 inline double MeasureStep(
     const std::string& step_name,
     std::function<void()> fn,
     int warmup, int runs,
     int gpu_id,
-    drv_gpu_lib::GPUProfiler& profiler)
+    drv_gpu_lib::profiling::ProfilingFacade& profiler)
 {
   // Warmup
   for (int w = 0; w < warmup; ++w) {
@@ -67,6 +69,9 @@ inline double MeasureStep(
 
   using SClock = std::chrono::steady_clock;
   using NS     = std::chrono::nanoseconds;
+
+  std::vector<std::pair<std::string, drv_gpu_lib::ROCmProfilingData>> events;
+  events.reserve(runs);
 
   for (int r = 0; r < runs; ++r) {
     auto tq = SClock::now();
@@ -101,16 +106,16 @@ inline double MeasureStep(
     pd.end_ns      = ns_queue + ns_submit + ns_exec;
     pd.complete_ns = ns_queue + ns_submit + ns_exec + ns_complete;
     pd.kernel_name = step_name;
-    profiler.Record(gpu_id, "Strategies", step_name, pd);
+    events.emplace_back(step_name, pd);
   }
 
-  // Return avg exec time (last run's ms is approximate, profiler has details)
-  return 0.0;  // GPUProfiler has all data
+  profiler.BatchRecord(gpu_id, "strategies/step_profiling", events);
+  return 0.0;  // facade stores all data
 }
 
 inline void run_step_profiling(drv_gpu_lib::IBackend* backend) {
-  auto& con      = drv_gpu_lib::ConsoleOutput::GetInstance();
-  auto& profiler  = drv_gpu_lib::GPUProfiler::GetInstance();
+  auto& con       = drv_gpu_lib::ConsoleOutput::GetInstance();
+  auto& profiler  = drv_gpu_lib::profiling::ProfilingFacade::GetInstance();
   const int gpu_id = 0;
 
   char prof_buf[256];
@@ -171,9 +176,8 @@ inline void run_step_profiling(drv_gpu_lib::IBackend* backend) {
   drv_map["driver_type"]    = "ROCm";
   drv_map["driver_version"] = dev.driver_version;
   report_info.drivers.push_back(drv_map);
-  profiler.SetGPUInfo(gpu_id, report_info);
-  profiler.Reset();
-  profiler.Start();
+  profiler.Enable(true);
+  profiler.SetGpuInfo(gpu_id, report_info);
 
   // ── 5. Measure individual steps ──────────────────────────────────────────
 
@@ -213,8 +217,11 @@ inline void run_step_profiling(drv_gpu_lib::IBackend* backend) {
     proc.process_full();
   }, kProfWarmup, kProfRuns, gpu_id, profiler);
 
-  // ── 7. Report (ONLY via GPUProfiler) ─────────────────────────────────────
-  profiler.Stop();
+  // ── 7. Report via ProfilingFacade (rule 06: WaitEmpty → Export) ─────────
+  profiler.WaitEmpty();
+  profiler.ExportJsonAndMarkdown(
+      "Results/Profiler/strategies/step_profiling.json",
+      "Results/Profiler/strategies/step_profiling.md");
   profiler.PrintReport();
 
   // ── 8. Cleanup ───────────────────────────────────────────────────────────
