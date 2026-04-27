@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "kernels": [
+    {
+      "name": "all_maxima_kernels",
+      "comment": "all_maxima: detect + scan + add + compact",
+      "created": "2026-04-16T15:07:39",
+      "params": "gfx1201",
+      "backend": "rocm"
+    }
+  ]
+}

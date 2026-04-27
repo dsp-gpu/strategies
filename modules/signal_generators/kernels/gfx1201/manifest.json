@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "kernels": [
+    {
+      "name": "FormSignal_kernels",
+      "comment": "FormSignal hiprtc kernels",
+      "created": "2026-04-16T15:07:39",
+      "params": "",
+      "backend": "rocm"
+    }
+  ]
+}
