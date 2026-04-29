@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Standalone test for dsp_strategies Python bindings (ROCm).
-NO pytest — run: python test_strategies.py
+Запуск: python test_strategies.py
 
 Tests:
   1. Import + ROCmGPUContext
