@@ -1,24 +1,53 @@
 #pragma once
 
-/**
- * @file strategies_float_api.hpp
- * @brief CPU-vector API for post-FFT strategies computations (declarations only)
- *
- * Provides convenience wrappers accepting std::vector<float> magnitudes:
- *   - OneMaxParabolaFromFloat  — one peak + parabolic interpolation per beam
- *   - GlobalMinMaxFromFloat    — global MIN + MAX + dynamic range per beam
- *   - AllMaximaFromMagnitudes  — all local maxima per beam via AllMaximaPipeline
- *
- * Pattern (same as StatisticsProcessor CPU wrappers):
- *   hipMalloc → H2D → GPU kernel → D2H → hipFree
- *
- * Phase C4 of kernel_cache_v2: split from 337-line header-inline to .hpp/.cpp.
- * Kernel compilation delegated to GpuContext (clean-slate v2 cache).
- *
- * IMPORTANT: ROCm-only. All code under #if ENABLE_ROCM.
- *
- * @date 2026-03-12  (split 2026-04-22)
- */
+// ============================================================================
+// StrategiesFloatApi — публичный CPU-vector API post-FFT вычислений модуля strategies
+//
+// ЧТО:    Тонкий C++-фасад поверх strategies kernel'ов для caller'ов, у
+//         которых данные magnitudes уже на CPU как std::vector<float>.
+//         Три метода: OneMaxParabolaFromFloat (один пик + парабола на луч),
+//         GlobalMinMaxFromFloat (min+max+dynamic_range на луч),
+//         AllMaximaFromMagnitudes (все локальные максимумы на луч через
+//         antenna_fft::AllMaximaPipelineROCm). Каждый метод сам выделяет
+//         GPU-буфер, делает H2D, запускает kernel, делает D2H, освобождает.
+//
+// ЗАЧЕМ:  Часть caller'ов (Python биндинги, unit-тесты, external tools) уже
+//         имеют magnitudes на CPU — им не нужно держать persistent
+//         AntennaProcessor с его 7 streams и буферами. Этот класс даёт
+//         lightweight «standalone» доступ к тем же strategies-kernel'ам,
+//         без overhead'а полного pipeline'а. Симметричен CPU wrapper'ам
+//         StatisticsProcessor (одинаковый паттерн hipMalloc→H2D→kernel→
+//         D2H→hipFree).
+//
+// ПОЧЕМУ: - GpuContext (Ref03 Layer 1) — компиляция strategies-ядер ровно
+//           один раз в ctor (disk-cached HSACO по CompileKey). При
+//           повторном создании на том же GPU/архитектуре kernel'ы берутся
+//           с диска без recompile (Phase C4 kernel_cache_v2).
+//         - Move/copy запрещены — owns GpuContext + AllMaximaPipelineROCm +
+//           hipFunction_t handles + hipStream_t. Копирование = chaos с
+//           lifetime kernel module'ов.
+//         - Forward declaration drv_gpu_lib::GpuContext — strategies_float_api
+//           используется во многих местах (Python binding, тесты), не
+//           тащим тяжёлый <core/interface/gpu_context.hpp> в header.
+//         - persistent stream_ + persistent kernel handles → между
+//           вызовами Free's и Compile's нет, только H2D/D2H буфера.
+//         - #if ENABLE_ROCM на весь header — на non-ROCm сборках класс
+//           недоступен (нет stub'а). Caller'ы строят с тем же гардом.
+//         - Phase C4 рефакторинг (2026-04-22): был 337-строчный header-inline,
+//           разбили на .hpp/.cpp + delegated kernel-compile в GpuContext.
+//
+// Использование:
+//   strategies::StrategiesFloatApi api(backend);
+//   std::vector<float> mags(n_ant * nFFT);  // готовые модули спектра
+//   auto peaks = api.OneMaxParabolaFromFloat(mags, n_ant, nFFT, sample_rate);
+//   auto mm    = api.GlobalMinMaxFromFloat(mags, n_ant, nFFT, sample_rate);
+//   auto all   = api.AllMaximaFromMagnitudes(mags, n_ant, nFFT, sample_rate);
+//
+// История:
+//   - Создан:  2026-03-12
+//   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер;
+//                          ранее: 2026-04-22 — split на .hpp/.cpp, GpuContext, Phase C4)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -40,11 +69,15 @@ namespace strategies {
 
 /**
  * @class StrategiesFloatApi
- * @brief Standalone post-FFT computations from CPU float magnitudes
+ * @brief Standalone post-FFT вычисления из CPU std::vector<float> магнитуд.
  *
- * Compiles strategies kernels once in the constructor via GpuContext
- * (disk-cached HSACO keyed by CompileKey).
- * Each method: H2D upload → kernel launch → D2H download (no persistent GPU state).
+ * @note Move/copy запрещены — owns GpuContext + kernel handles + AllMaximaPipelineROCm.
+ * @note Только ROCm (#if ENABLE_ROCM). На non-ROCm сборках класс недоступен.
+ * @note Каждый метод: hipMalloc → H2D → kernel → D2H → hipFree (нет persistent GPU state).
+ * @note Kernel'ы компилируются один раз в ctor через GpuContext (disk-cached HSACO).
+ * @see GpuContext — Ref03 Layer 1, kernel compile/cache
+ * @see AllMaximaPipelineROCm — переиспользуется для AllMaximaFromMagnitudes
+ * @see AntennaProcessor_v1 — полный pipeline для GPU-resident данных
  */
 class StrategiesFloatApi {
 public:

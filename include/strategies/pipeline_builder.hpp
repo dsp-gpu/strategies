@@ -1,19 +1,50 @@
 #pragma once
 
-/**
- * @file pipeline_builder.hpp
- * @brief PipelineBuilder — fluent API for constructing Pipeline
- *
- * Ref03-C: Build pipelines declaratively:
- *   auto pipe = PipelineBuilder()
- *     .add(make_unique<GemmStep>())
- *     .add(make_unique<WindowFftStep>())
- *     .add_parallel({OneMax, AllMaxima, MinMax}, {s1, s2, s3})
- *     .build();
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
- */
+// ============================================================================
+// PipelineBuilder — fluent-конструктор Pipeline (Ref03-C, GoF Builder)
+//
+// ЧТО:    Промежуточный объект для декларативной сборки Pipeline. Имеет
+//         три метода-добавителя: add(step), add_if(cond, step),
+//         add_parallel(group, streams) — каждый возвращает *this для
+//         цепочки. После build() возвращает std::unique_ptr<Pipeline> и
+//         перекладывает владение шагами через std::move.
+//
+// ЗАЧЕМ:  Без Builder сборка Pipeline в фасаде выглядела бы как 30 строк
+//         push_back в три разных vector'а с ручным заполнением Entry.
+//         Builder инкапсулирует эту бухгалтерию: один вызов add() ставит
+//         запись в entries_ + кладёт unique_ptr в steps_, один вызов
+//         add_parallel() — Entry типа PARALLEL + ParallelGroup в
+//         parallel_groups_. Фасад читается как декларация: «GEMM, потом
+//         FFT, потом параллельно три post-FFT».
+//
+// ПОЧЕMУ: - GoF Builder: build() — финализация, после неё Builder
+//           разрушается (move-out внутренних vector'ов). Повторный build
+//           даст пустой Pipeline (намеренно — единичная сборка).
+//         - add_if(cond, step) — конструктор-conditional: если condition
+//           false, шаг ВООБЩЕ не создаётся в Pipeline (отличие от
+//           IsEnabled, который создаёт шаг и решает в runtime).
+//           Для редко используемых тяжёлых шагов это экономит память.
+//         - add_parallel принимает ВСЕ шаги группы + ВСЕ streams сразу —
+//           гарантирует, что они попадут в один Entry::PARALLEL и не
+//           разъедутся по индексам.
+//         - friend class Pipeline (см. Pipeline::PipelineBuilder
+//           в pipeline.hpp) — Builder лезет в приватные all_steps_ /
+//           entries_ / parallel_groups_, чтобы избежать публичных
+//           setter'ов которые порушат immutability Pipeline.
+//
+// Использование:
+//   auto pipe = PipelineBuilder()
+//     .add(std::make_unique<GemmStep>())
+//     .add(std::make_unique<WindowFftStep>())
+//     .add_if(cfg.scenario_mode != PostFftScenarioMode::NONE,
+//             std::make_unique<DebugStatsStep>(DebugPoint::POST_FFT))
+//     .add_parallel(std::move(post_steps),
+//                   {ctx.stream_post_a, ctx.stream_post_b, ctx.stream_post_c})
+//     .build();
+//
+// История:
+//   - Создан: 2026-03-14 (Ref03-C, GoF Builder для Pipeline)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -25,9 +56,18 @@
 
 namespace strategies {
 
+/**
+ * @class PipelineBuilder
+ * @brief Fluent Builder для Pipeline: add()/add_if()/add_parallel() → build().
+ *
+ * @note Move-only по сути: build() переносит владение шагами в Pipeline.
+ * @note Цепочка вызовов возвращает *this — пишется в одну C++-выражение.
+ * @see Pipeline           — финальный объект, immutable после build().
+ * @see IPipelineStep      — контракт шага, передаётся через unique_ptr.
+ */
 class PipelineBuilder {
 public:
-  /// Add a sequential step
+  /// Добавить sequential-шаг (выполняется по очереди после предыдущих).
   PipelineBuilder& add(std::unique_ptr<IPipelineStep> step) {
     Pipeline::Entry entry;
     entry.type = Pipeline::Entry::SEQUENTIAL;
@@ -37,13 +77,17 @@ public:
     return *this;
   }
 
-  /// Add a step only if condition is true
+  /// Добавить шаг ТОЛЬКО если condition==true (compile-time/host-side фильтр).
+  /// Отличие от IPipelineStep::IsEnabled: при condition==false шаг даже
+  /// не создаётся в Pipeline → экономия памяти на отключённых тяжёлых шагах.
   PipelineBuilder& add_if(bool condition, std::unique_ptr<IPipelineStep> step) {
     if (condition) return add(std::move(step));
     return *this;
   }
 
-  /// Add a parallel group (steps run on different streams concurrently)
+  /// Добавить parallel-группу: шаги [i] запускаются на streams[i] параллельно.
+  /// Pipeline::Execute сделает hipStreamSynchronize по ВСЕМ streams группы
+  /// перед переходом к следующему Entry — синхронизация автоматическая.
   PipelineBuilder& add_parallel(
       std::vector<std::unique_ptr<IPipelineStep>> group_steps,
       std::vector<hipStream_t> streams) {
@@ -63,7 +107,8 @@ public:
     return *this;
   }
 
-  /// Build the pipeline (moves ownership)
+  /// Финализация: создать Pipeline и перенести в него всё накопленное.
+  /// После build() Builder можно разрушить (внутренние vector'ы пусты).
   std::unique_ptr<Pipeline> build() {
     auto p = std::make_unique<Pipeline>();
     p->all_steps_ = std::move(steps_);

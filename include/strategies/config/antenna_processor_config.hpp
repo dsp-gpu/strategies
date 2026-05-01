@@ -1,10 +1,15 @@
 #pragma once
 
 /**
- * @file antenna_processor_config.hpp
- * @brief Configuration for AntennaProcessor pipeline
+ * @brief Конфигурация AntennaProcessor — размеры, частоты, режим сценария, статистики, чекпоинты.
  *
- * @date 2026-03-07
+ * @note Тип B (technical header): два POD-struct (CheckpointSaveConfig + AntennaProcessorConfig),
+ *       без логики, только default'ы. Валидация (n_ant > 0, n_samples > 0) — в AntennaProcessor_v1::ctor.
+ *       save_cfg = nullptr → подставляется NullCheckpointSave (zero overhead в production).
+ *
+ * История:
+ *   - Создан:  2026-03-07
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #include <strategies/config/post_fft_scenario_mode.hpp>

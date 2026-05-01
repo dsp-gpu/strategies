@@ -2,16 +2,18 @@
 
 /**
  * @file pipeline_context.hpp
- * @brief PipelineContext — shared state for all pipeline steps
+ * @brief PipelineContext — shared state-агрегатор для всех IPipelineStep + enum индексов буферов.
  *
- * Ref03-C: Composition struct (non-owning). Aggregates references to
- * everything a step needs: GPU context, buffers, handles, config, result.
+ * @note Тип B (technical header): композиционный non-owning struct + enum
+ *       PipelineBuf. Без логики кроме одного inline-accessor buf(id).
+ *       Владение полей — у Facade (AntennaProcessor_v1): backend, gpu_ctx,
+ *       cfg, GPU handles (hipblas/hipfft), streams/events, BufferSet,
+ *       sub-processors. Поля immutable после конструктора Facade'а;
+ *       d_S/d_W/result обновляются перед каждым process()/Pipeline::Execute.
  *
- * Owned by Facade (AntennaProcessor_v1). Filled once in constructor,
- * d_S/d_W/result updated per process() call.
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
+ * История:
+ *   - Создан:  2026-03-14 (Ref03-C, выделено из AntennaProcessor)
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #if ENABLE_ROCM
@@ -33,7 +35,12 @@ namespace fft_processor { class ComplexToMagPhaseROCm; }
 
 namespace strategies {
 
-/// Buffer indices for the pipeline's BufferSet
+/**
+ * @enum PipelineBuf
+ * @brief Индексы в BufferSet<kBufCount>; используются всеми шагами через ctx.buf(id).
+ * @note Compile-time индексы (size_t) — ноль runtime-overhead; добавление
+ *       нового буфера = вставка значения ДО kBufCount + увеличение размера.
+ */
 enum PipelineBuf : size_t {
   kBufX = 0,            ///< [n_ant × n_samples] GEMM output
   kBufFftInput,         ///< [n_ant × nFFT] zero-padded for FFT
@@ -45,6 +52,17 @@ enum PipelineBuf : size_t {
   kBufCount
 };
 
+/**
+ * @struct PipelineContext
+ * @brief Shared non-owning агрегатор: backend, kernels, streams, buffers, sub-processors, result.
+ *
+ * @note Все указатели non-owning (владелец — Facade AntennaProcessor_v1).
+ * @note Заполняется один раз в конструкторе фасада; d_S/d_W/result —
+ *       перед каждым Pipeline::Execute (это per-call inputs/outputs).
+ * @see Pipeline           — потребитель: каждый Entry получает ссылку.
+ * @see IPipelineStep      — Execute(PipelineContext&) — единственный способ доступа к ресурсам.
+ * @see drv_gpu_lib::BufferSet — управление GPU-буферами через enum PipelineBuf.
+ */
 struct PipelineContext {
   // ── Immutable references (set once in constructor) ────────────────────
   drv_gpu_lib::IBackend* backend = nullptr;
@@ -91,6 +109,7 @@ struct PipelineContext {
   AntennaResult* result = nullptr;
 
   // ── Helper accessors ──────────────────────────────────────────────────
+  /// Получить device-pointer буфера по enum-индексу (zero-overhead).
   void* buf(PipelineBuf id) const {
     return buffers->Get(static_cast<size_t>(id));
   }

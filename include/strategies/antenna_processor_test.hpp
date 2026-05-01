@@ -1,17 +1,60 @@
 #pragma once
 
-/**
- * @file antenna_processor_test.hpp
- * @brief AntennaProcessorTest - step-by-step test wrapper over AntennaProcessor_v1
- *
- * Inherits from AntennaProcessor_v1 and exposes individual pipeline steps
- * for debugging, validation, and Python step-by-step testing.
- *
- * Each step_ method executes one pipeline stage and returns data to CPU
- * for comparison with NumPy/SciPy reference.
- *
- * @date 2026-03-07
- */
+// ============================================================================
+// AntennaProcessorTest — step-by-step test-обёртка над AntennaProcessor_v1
+//
+// ЧТО:    Наследник AntennaProcessor_v1, открывающий каждую фазу pipeline'а
+//         как отдельный публичный step_*-метод (step_0_prepare_input,
+//         step_1_debug_input, step_2_gemm, step_3_debug_post_gemm,
+//         step_4_window_fft, step_5_debug_post_fft, step_6_1/6_2/6_3 —
+//         три post-FFT сценария). Каждый шаг исполняет ровно одну стадию,
+//         синхронизирует stream и копирует результат на CPU как
+//         std::vector<std::complex<float>> или AntennaResult — для
+//         сравнения с NumPy/SciPy эталоном из Python-теста.
+//
+// ЗАЧЕМ:  В production AntennaProcessor_v1::process идёт сплошным потоком
+//         (overlap по 7 streams, без точек копирования). Для отладки и
+//         валидации каждой стадии нужно остановиться, забрать GPU-буфер
+//         на CPU и сверить с эталоном — это невозможно через process().
+//         Test-наследник даёт ровно эту возможность, не разрушая
+//         production-путь и не дублируя логику фаз (do_*-методы — protected
+//         в v1, доступны через наследование).
+//
+// ПОЧЕМУ: - Inheritance вместо отдельной копии: protected do_*-методы
+//           v1 — точные блоки production-логики. Test переиспользует их,
+//           гарантия что test и production исполняют один и тот же код.
+//         - using AntennaProcessor_v1::AntennaProcessor_v1 — наследование
+//           конструкторов, не нужно писать свой ctor.
+//         - copy_buffer_to_cpu — приватный helper: hipMemcpy D2H
+//           num_complex_elements × sizeof(complex<float>). Все step_-
+//           методы используют для единообразного D2H.
+//         - Каждый step_ синхронизирует stream/device — тесты ждут
+//           завершения, тогда CPU читает корректные данные. В production
+//           этих sync'ов нет (overlap), но в тесте — обязательны для
+//           детерминированной сверки.
+//         - step_6_X-методы временно подменяют scenario_mode через
+//           const_cast (чтобы запустить ровно один сценарий) — допустимый
+//           хак в тестовом контексте, восстанавливает значение после.
+//         - process_full / process_full_managed_w — сценарии с разными
+//           источниками весов (внешние upload через set_external_weights vs
+//           caller-managed GPU pointer).
+//         - step_0_signal_only — оптимизация повторного процессинга:
+//             d_W уже на GPU (managed), не перезагружаем при каждом кадре.
+//
+// Использование:
+//   AntennaProcessorTest test(backend, cfg);
+//   test.set_external_weights(W);
+//   test.step_0_prepare_input(d_S, test.get_managed_weights_ptr());
+//   auto stats_in = test.step_1_debug_input();
+//   auto X        = test.step_2_gemm();      // CPU-копия d_X для сверки с np.matmul
+//   auto stats_X  = test.step_3_debug_post_gemm();
+//   auto spec     = test.step_4_window_fft(); // CPU-копия для сверки с np.fft.fft
+//   auto peaks    = test.step_6_1_one_max_parabola();
+//
+// История:
+//   - Создан:  2026-03-07
+//   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
+// ============================================================================
 
 #include <strategies/antenna_processor_v1.hpp>
 #include <strategies/weight_generator.hpp>
@@ -21,6 +64,17 @@
 
 namespace strategies {
 
+/**
+ * @class AntennaProcessorTest
+ * @brief Step-by-step расширение AntennaProcessor_v1 для отладки и Python-валидации.
+ *
+ * @note Наследник AntennaProcessor_v1 — переиспользует protected do_*-методы
+ *       (исполняют ту же логику, что и production-process).
+ * @note Каждый step_-метод синхронизирует stream и копирует результат на CPU.
+ * @note Не для production (overhead D2H + sync на каждом шаге).
+ * @see AntennaProcessor_v1 — production-родитель
+ * @see WeightGenerator — генератор тестовых весовых матриц
+ */
 class AntennaProcessorTest : public AntennaProcessor_v1 {
 public:
   using AntennaProcessor_v1::AntennaProcessor_v1;  // Inherit constructors

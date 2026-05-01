@@ -1,18 +1,54 @@
 #pragma once
 
-/**
- * @file debug_stats_step.hpp
- * @brief DebugStatsStep — parameterized statistics at debug points
- *
- * Ref03-C Pipeline Step.
- * Three instances: PRE_INPUT, POST_GEMM, POST_FFT.
- * Each waits on appropriate event, computes stats, saves checkpoint.
- *
- * Cross-module: uses StatisticsProcessor (from statistics module).
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
- */
+// ============================================================================
+// DebugStatsStep — статистика в debug-точках pipeline'а (Ref03-C Step)
+//
+// ЧТО:    Параметризованный pipeline-шаг с тремя инстансами по точке
+//         наблюдения (DebugPoint::PRE_INPUT, POST_GEMM, POST_FFT).
+//         В каждой точке: ждёт нужное hipEvent (если есть), вызывает
+//         StatisticsProcessor::ComputeStatistics[Float] на соответствующем
+//         буфере, опционально считает ComputeMedian (если в маске StatPreset
+//         есть STAT_MEDIAN), записывает в result->{pre_input/post_gemm/post_fft}_stats
+//         и сохраняет чекпоинт через ICheckpointSave (бинарный dump для
+//         offline-анализа в Python).
+//
+// ЗАЧЕМ:  В DSP-пайплайне РЛС нужно валидировать данные на КАЖДОМ этапе:
+//         входной сигнал d_S, после взвешивания d_X (выход GEMM), после FFT
+//         |spectrum|. Без debug-точек невозможно отлаживать кросс-модульные
+//         проблемы (где «уехали» данные — на входе, после GEMM, в спектре).
+//         Один параметризованный класс вместо трёх ScopedStats-классов
+//         избегает дублирования кода (event wait + compute + checkpoint
+//         идентичны, отличаются только источник данных и event).
+//
+// ПОЧЕМУ: - Один класс с enum DebugPoint вместо трёх классов: SRP не
+//           нарушается, потому что роль одна — «считай stats в точке X»;
+//           точка передаётся в конструктор. Три отдельных класса дали бы
+//           ~60 строк копипасты на каждый.
+//         - hipStreamWaitEvent (НЕ hipEventSynchronize) — non-blocking
+//           между host и GPU; шаг ставится на debug-stream, который ждёт
+//           основной поток через event. Если в Pipeline это PARALLEL-шаг —
+//           debug-вычисления идут параллельно основному, не блокируя GEMM.
+//         - PRE_INPUT не ждёт events — d_S уже на GPU из ctx (caller гарантирует).
+//         - POST_FFT использует ComputeStatisticsFloat (магнитуды float),
+//           PRE_INPUT/POST_GEMM — ComputeStatistics (complex). Разные
+//           dispatch'и, выбираются по DebugPoint host-side, не по runtime
+//           проверке типа в kernel.
+//         - Cross-module: явная зависимость от stats::StatisticsProcessor
+//           через PipelineContext (non-owning ptr). Шаг не создаёт
+//           processor сам — переиспользует один на pipeline.
+//         - ICheckpointSave абстракция: в production — пустой stub,
+//           в тестах — пишет в файл. Ноль overhead в release.
+//
+// Использование:
+//   builder.add(std::make_unique<DebugStatsStep>(DebugPoint::PRE_INPUT))
+//          .add(std::make_unique<GemmStep>())
+//          .add(std::make_unique<DebugStatsStep>(DebugPoint::POST_GEMM))
+//          .add(std::make_unique<WindowFftStep>())
+//          .add(std::make_unique<DebugStatsStep>(DebugPoint::POST_FFT));
+//
+// История:
+//   - Создан: 2026-03-14 (Ref03-C, объединение трёх debug-шагов в один)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -25,12 +61,27 @@
 
 namespace strategies {
 
+/**
+ * @enum DebugPoint
+ * @brief Точка наблюдения для DebugStatsStep: до/после GEMM/после FFT.
+ */
 enum class DebugPoint : uint8_t { PRE_INPUT, POST_GEMM, POST_FFT };
 
+/**
+ * @class DebugStatsStep
+ * @brief Pipeline-шаг: статистика + median + checkpoint в debug-точке.
+ *
+ * @note Параметризован DebugPoint в конструкторе — три экземпляра на pipeline.
+ * @note Использует hipStreamWaitEvent (non-blocking GPU-sync между streams).
+ * @note Cross-module зависимость: stats::StatisticsProcessor через PipelineContext.
+ * @see stats::StatisticsProcessor — реализация Welford/median/histogram.
+ * @see ICheckpointSave             — абстракция дампа в файл (для offline Python-анализа).
+ */
 class DebugStatsStep : public PipelineStepBase {
 public:
   explicit DebugStatsStep(DebugPoint point) : point_(point) {}
 
+  /// Имя зависит от DebugPoint: DebugStats_{PreInput|PostGEMM|PostFFT}.
   const char* Name() const override {
     switch (point_) {
       case DebugPoint::PRE_INPUT: return "DebugStats_PreInput";
@@ -40,6 +91,7 @@ public:
     return "DebugStats_Unknown";
   }
 
+  /// Включён если StatPreset для соответствующей точки != NONE.
   bool IsEnabled(const AntennaProcessorConfig& cfg) const override {
     switch (point_) {
       case DebugPoint::PRE_INPUT: return cfg.pre_input_stats != StatPreset::NONE;
@@ -49,6 +101,14 @@ public:
     return false;
   }
 
+  /**
+   * @brief Считать статистики (+median по флагу) в точке point_, записать в result + checkpoint.
+   * @param ctx Shared context: stats_processor, checkpoint, нужные буферы и events.
+   *
+   * Для POST_GEMM/POST_FFT ставит hipStreamWaitEvent на debug-stream
+   * перед запуском вычислений — гарантия что данные готовы. PRE_INPUT
+   * не ждёт (d_S уже на GPU по контракту caller'а).
+   */
   void Execute(PipelineContext& ctx) override {
     statistics::StatisticsParams sp;
     sp.beam_count = ctx.cfg->n_ant;

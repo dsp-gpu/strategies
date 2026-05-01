@@ -1,14 +1,16 @@
 #pragma once
 
 /**
- * @file post_fft_scenario_mode.hpp
- * @brief PostFftScenarioMode enum for AntennaProcessor
+ * @brief enum PostFftScenarioMode — выбор post-FFT сценария AntennaProcessor.
  *
- * Controls which post-FFT scenarios are executed:
- * - ALL_REQUIRED: production mode, all 3 scenarios
- * - Individual modes for debug/benchmark
+ * @note Тип B (technical header): только enum.
+ *       ALL_REQUIRED — production-режим (все 3 сценария: OneMaxParabola + AllMaxima + GlobalMinMax).
+ *       Индивидуальные режимы (ONE_MAX_PARABOLA / ALL_MAXIMA / GLOBAL_MINMAX) — для debug и benchmark.
+ *       Применяется в AntennaProcessor::set_scenario_mode и AntennaProcessor_v1::do_run_post_fft_scenarios.
  *
- * @date 2026-03-07
+ * История:
+ *   - Создан:  2026-03-07
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #include <cstdint>

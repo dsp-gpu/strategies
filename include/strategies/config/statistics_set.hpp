@@ -1,10 +1,16 @@
 #pragma once
 
 /**
- * @file statistics_set.hpp
- * @brief StatField bitmask and StatPreset constants for debug point statistics
+ * @brief Bitmask StatField + готовые preset'ы StatPreset для отбора метрик в debug-точках pipeline'а.
  *
- * @date 2026-03-07
+ * @note Тип B (technical header): enum-флаги (mean / median / std / var / min / max) + alias
+ *       StatisticsSet = uint32_t + namespace StatPreset с пресетами P61_ALL, P62_MEAN_MED, P63_MED_MM, P64_STD_VAR.
+ *       Используется в AntennaProcessorConfig для трёх debug-точек (pre_input / post_gemm / post_fft).
+ *       Битовая маска → один проход statistics::StatisticsProcessor отдаёт ровно нужные поля.
+ *
+ * История:
+ *   - Создан:  2026-03-07
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #include <cstdint>

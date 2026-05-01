@@ -1,28 +1,28 @@
 #pragma once
 
 /**
- * @file strategies_kernels_rocm.hpp
- * @brief Optimized HIP kernel sources for AntennaProcessor pipeline
+ * @brief HIP kernel-source для pipeline AntennaProcessor (Hamming+pad / |FFT| / OneMax / MinMax).
  *
- * Kernels:
- *   1. hamming_pad_fused  - Hamming window + zero-padding in one kernel (fusion P13+P10)
- *   2. compute_magnitudes - |FFT[i]| via fast intrinsic (P9)
- *   3. global_minmax      - Per-beam min+max with warp shuffle reduction (P7+P8)
- *   4. one_max_no_phase   - Per-beam one max + parabola with warp shuffle (P7+P8)
+ * @note Тип B (technical header): R"HIP(...)HIP" source для hiprtc.
+ *       Четыре ядра:
+ *         1. hamming_pad_fused  — fusion: Hamming-окно + zero-padding в один проход (P13+P10).
+ *         2. compute_magnitudes — |FFT[i]| через fast intrinsic __fsqrt_rn (P9).
+ *         3. global_minmax     — per-beam min+max через LDS-tree + warp shuffle reduction (P7+P8).
+ *         4. one_max_no_phase  — per-beam один максимум + 3-точечная параболическая интерполяция (P7+P8).
+ *       Применённые оптимизации:
+ *         - __launch_bounds__(BLOCK_SIZE) на всех ядрах (P5).
+ *         - 2D grid: blockIdx.y = beam_id → нет div/mod (P6).
+ *         - Warp shuffle для финальных стадий редукции (P7).
+ *         - LDS +1 padding против bank conflicts (P8).
+ *         - Fast math intrinsics: __cosf, __fsqrt_rn, __log10f (P9).
+ *         - Precomputed Hamming window — передаётся аргументом (P10).
+ *         - Fused hamming+pad убирает промежуточный global mem R/W (P13).
+ *         - BLOCK_SIZE и WARP_SIZE прокидываются через -D в hiprtc.
+ *       Компиляция в runtime: hiprtc + -O3 --offload-arch=gfxXXXX (gfx1201 / gfx908).
  *
- * Optimizations applied:
- *   - __launch_bounds__(BLOCK_SIZE) on all kernels (P5)
- *   - 2D grid: blockIdx.y = beam_id, no div/mod (P6)
- *   - Warp shuffle for final reduction stages (P7)
- *   - LDS +1 padding to avoid bank conflicts (P8)
- *   - Fast math intrinsics: __cosf, __fsqrt_rn, __log10f (P9)
- *   - Precomputed Hamming window table passed as argument (P10)
- *   - Fused hamming+pad kernel eliminates intermediate global mem R/W (P13)
- *   - BLOCK_SIZE and WARP_SIZE passed via -D at compile time
- *
- * Compiled at runtime via hiprtc with -O3 --offload-arch=gfxXXXX.
- *
- * @date 2026-03-07
+ * История:
+ *   - Создан:  2026-03-07
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #if ENABLE_ROCM

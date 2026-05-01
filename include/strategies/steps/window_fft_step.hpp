@@ -1,18 +1,52 @@
 #pragma once
 
-/**
- * @file window_fft_step.hpp
- * @brief WindowFftStep — Hamming window + zero-pad + batch FFT + magnitudes
- *
- * Ref03-C Pipeline Step.
- * Reads: kBufX, kBufHammingWindow
- * Writes: kBufFftInput, kBufSpectrum, kBufMagnitudes
- * Stream: stream_main
- * Post: records event_fft_done on stream_main
- *
- * @author Kodo (AI Assistant)
- * @date 2026-03-14
- */
+// ============================================================================
+// WindowFftStep — окно Hamming + zero-pad + batch FFT + magnitudes (Ref03-C Step)
+//
+// ЧТО:    «Толстый» pipeline-шаг, объединяющий 4 операции:
+//           1. hipMemsetAsync — занулить kBufFftInput полностью (для zero-padding);
+//           2. fused-kernel hamming_pad_fused — наложить окно Hamming на kBufX
+//              и записать в первые n_samples элементов kBufFftInput
+//              (оставшиеся nFFT - n_samples — нули из шага 1);
+//           3. hipfftExecC2C(HIPFFT_FORWARD) — batch FFT kBufFftInput → kBufSpectrum;
+//           4. ComplexToMagPhaseROCm::ProcessMagnitudeToBuffer —
+//              kBufSpectrum → kBufMagnitudes (|X|, без фазы, zero-alloc).
+//         Всё на ctx.stream_main; в конце — hipEventRecord(event_fft_done)
+//         для зависимых шагов (DebugStatsStep::POST_FFT, OneMax/AllMaxima/MinMax).
+//
+// ЗАЧЕМ:  Эти 4 операции жёстко связаны (FFT-pipeline) и переиспользования
+//         поодиночке не имеют — оборачивать в один шаг разумно. Если бы
+//         каждая была отдельным шагом, пришлось бы тащить ещё 3 hipEvent
+//         для синхронизации между ними, при том что на одном stream это
+//         не нужно (FIFO-исполнение).
+//
+// ПОЧЕМУ: - hipMemsetAsync БОЛЬШЕ kBufFftInput (n_ant × nFFT × complex),
+//           а fused-kernel пишет ТОЛЬКО первые n_samples — оптимизация P11
+//           убирает if-else в kernel'е (без проверки «индекс < n_samples
+//           ? data : 0» в каждом thread'е). Memset один раз, fused-kernel
+//           без branch'а → лучше для warp execution на gfx1201.
+//         - hamming_pad_fused (P13+P10+P6) — фьюжен: окно + копия + pad
+//           в одном kernel'е, ОДИН проход по data. Альтернатива (3 kernel'а)
+//           = 3× memory bandwidth, что критично на ~MB-данных.
+//         - Batch FFT через hipfft plan (был создан фасадом с
+//           rank=1, batch=n_ant): один вызов hipfftExecC2C обрабатывает
+//           все лучи одновременно, без host-loop.
+//         - ComplexToMagPhaseROCm::ProcessMagnitudeToBuffer с третьим
+//           параметром {n_ant, nFFT, 0.0f} — последний 0.0f это inv_n
+//           норма: 0 значит «без нормировки» (hipfft не нормирует, мы тоже
+//           оставляем |X| без 1/N — это контракт API, нормирование на
+//           CPU при сравнении с эталоном).
+//         - hipEventRecord ПОСЛЕ всех 4 операций — гарантия что
+//           dependent шаги (post-FFT) увидят kBufMagnitudes и kBufSpectrum.
+//
+// Использование:
+//   builder.add(std::make_unique<GemmStep>())
+//          .add(std::make_unique<WindowFftStep>())            // вот этот
+//          .add(std::make_unique<DebugStatsStep>(DebugPoint::POST_FFT));
+//
+// История:
+//   - Создан: 2026-03-14 (Ref03-C, фьюжен трёх старых шагов в один)
+// ============================================================================
 
 #if ENABLE_ROCM
 
@@ -28,11 +62,27 @@ namespace fft_processor { struct MagPhaseParams; }
 
 namespace strategies {
 
+/**
+ * @class WindowFftStep
+ * @brief Pipeline-шаг: zero-pad + Hamming + hipfftExecC2C + |X| (zero-alloc).
+ *
+ * @note IsEnabled = always true (FFT — обязательный этап pipeline'а).
+ * @note Все операции на ctx.stream_main; в конце hipEventRecord(event_fft_done).
+ * @note Magnitude без нормировки (inv_n=0): hipfft не делит на N, мы тоже не делим.
+ * @see GemmStep                              — поставщик kBufX через event_gemm_done.
+ * @see fft_processor::ComplexToMagPhaseROCm  — реализация magnitude (zero-alloc).
+ */
 class WindowFftStep : public PipelineStepBase {
 public:
   const char* Name() const override { return "WindowFFT"; }
   bool IsEnabled(const AntennaProcessorConfig&) const override { return true; }
 
+  /**
+   * @brief Запустить memset → fused window+pad → FFT → magnitudes, записать event_fft_done.
+   * @param ctx Shared context: kBufX, kBufHammingWindow, kBufFftInput, kBufSpectrum, kBufMagnitudes,
+   *            fft_plan, complex_to_mag, stream_main, event_fft_done.
+   * @throws std::runtime_error при ошибке любого kernel/hipfft вызова.
+   */
   void Execute(PipelineContext& ctx) override {
     uint32_t n_ant = ctx.cfg->n_ant;
     uint32_t n_samples = ctx.cfg->n_samples;

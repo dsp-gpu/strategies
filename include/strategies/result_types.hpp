@@ -2,13 +2,19 @@
 
 /**
  * @file result_types.hpp
- * @brief Result structures for AntennaProcessor pipeline
+ * @brief POD-результаты pipeline'а AntennaProcessor: OneMaxParabolaLite, MinMaxResult, PerfMetrics, AntennaResult.
  *
- * Reuses MaxValue, AllMaximaBeamResult from fft_func.
- * Reuses StatisticsResult, MedianResult from statistics.
- * Adds MinMaxResult for Step2.3 and AntennaResult as aggregate.
+ * @note Тип B (technical header): чистые POD-struct'ы без логики, только
+ *       defaults. Переиспользует MaxValue/AllMaximaBeamResult из spectrum
+ *       и StatisticsResult/MedianResult из stats. Добавляет:
+ *         - OneMaxParabolaLite — пик без фазы (Step2.1, lightweight);
+ *         - MinMaxResult       — min+max за один проход (Step2.3, sizeof=36, выровнен);
+ *         - PerfMetrics        — таймлайн всех шагов в мс;
+ *         - AntennaResult      — агрегат всех debug-stats + scenario-результатов.
  *
- * @date 2026-03-07
+ * История:
+ *   - Создан:  2026-03-07
+ *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
 #include <strategies/config/post_fft_scenario_mode.hpp>
@@ -20,7 +26,11 @@
 
 namespace strategies {
 
-// OneMax result without phase (Step2.1 lightweight version)
+/**
+ * @struct OneMaxParabolaLite
+ * @brief Пик спектра без фазы (Step2.1) + 3-точечная параболическая интерполяция.
+ * @note Отличие от OneMaxParabola (с фазой) — без поля phase, в ~2× меньше D2H-копирования.
+ */
 struct OneMaxParabolaLite {
   uint32_t beam_id          = 0;
   uint32_t bin_index        = 0;      ///< FFT bin of the peak
@@ -29,7 +39,12 @@ struct OneMaxParabolaLite {
   float    refined_freq_hz  = 0.0f;   ///< (bin + delta) * fs / nFFT
 };
 
-// Global MIN + MAX per beam (Step2.3)
+/**
+ * @struct MinMaxResult
+ * @brief Глобальные MIN + MAX по лучу (Step2.3) + dynamic range в дБ.
+ * @note sizeof = 36 байт (9 × uint32/float), pad для 32-байтового выравнивания.
+ *       Device-side зеркало MinMaxResult_t в kernel global_minmax.
+ */
 struct MinMaxResult {
   uint32_t beam_id           = 0;
   // Min
@@ -46,7 +61,10 @@ struct MinMaxResult {
 };
 // sizeof = 36 bytes (9 x uint32/float). GPU kernel uses MinMaxResult_t separately.
 
-// Performance metrics per step
+/**
+ * @struct PerfMetrics
+ * @brief Тайминги (в мс) каждого шага pipeline'а + total — для отчёта производительности.
+ */
 struct PerfMetrics {
   float debug_21_ms  = 0.0f;
   float gemm_ms      = 0.0f;
@@ -60,7 +78,12 @@ struct PerfMetrics {
   float total_ms     = 0.0f;
 };
 
-// Aggregate result from process()
+/**
+ * @struct AntennaResult
+ * @brief Агрегатный результат AntennaProcessor::process(): debug-stats + scenario-результаты + perf.
+ * @note Заполняется шагами через ctx.result-> в Pipeline::Execute. Поля,
+ *       соответствующие отключённым шагам, остаются пустыми (default-vector).
+ */
 struct AntennaResult {
   // Debug point statistics
   std::vector<statistics::StatisticsResult> pre_input_stats;  ///< 2.1: on d_S
