@@ -1,15 +1,24 @@
 #pragma once
 
+// ============================================================================
+// test_base_strategy.hpp — runner BaseStrategyTest × 4 варианта сигнала
+//
+// ЧТО:    run_sin_only(backend) — быстрый smoke-тест (SIN, Small params).
+//         run_all_variants(backend) — прогон BaseStrategyTest для
+//         SIN / LFM_NO_DELAY / LFM_WITH_DELAY / LFM_FARROW.
+// ЗАЧЕМ:  Первый уровень проверки корректности pipeline при изменениях.
+//         run_sin_only() — включён в all_test.hpp по умолчанию.
+//         run_all_variants() — вызывается при полном тест-прогоне.
+// ПОЧЕМУ: Composite (GoF): несколько тестов запускаются как один.
+//         Исключение в одном варианте не останавливает остальные.
+//
+// История: Создан: 2026-03-15
+// ============================================================================
+
 /**
  * @file test_base_strategy.hpp
- * @brief Runner: BaseStrategyTest × 4 варианта сигнала (Composite GoF)
- *
- * Запускает BaseStrategyTest для всех вариантов сигнала:
- *   SIN / LFM_NO_DELAY / LFM_WITH_DELAY / LFM_FARROW
- *
- * Composite: StrategyTestSuite — список тестов, RunAll() проходит все.
- *
- * @date 2026-03-15
+ * @brief Runner: BaseStrategyTest × 4 варианта сигнала.
+ * @note Не публичный API. Подключается через all_test.hpp.
  */
 
 #if ENABLE_ROCM

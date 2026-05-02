@@ -1,26 +1,25 @@
 #pragma once
 
+// ============================================================================
+// strategy_test_base.hpp — базовый класс всех тестов стратегии (Template Method)
+//
+// ЧТО:    StrategyTestBase — абстрактный базовый класс с инвариантным
+//         скелетом теста: Run() → Setup → GenerateSignals → PrepareMatrix
+//         → Execute → Validate → SaveResults → Teardown.
+// ЗАЧЕМ:  Устраняет дублирование кода инициализации GPU и генерации сигнала
+//         во всех тест-классах (BaseStrategyTest, DebugStepTest, Timing...).
+//         Подкласс реализует только Execute() + Validate() (SRP).
+// ПОЧЕМУ: GoF Template Method: Run() — invariant (final), Execute/Validate —
+//         pure virtual (abstract). GRASP Controller: координирует поток теста.
+//         DIP: зависит от ISignalStrategy*, не от конкретных реализаций.
+//
+// История: Создан: 2026-03-15
+// ============================================================================
+
 /**
- * @file strategy_test_base.hpp
- * @brief StrategyTestBase — Template Method (GoF) для тестов стратегии
- *
- * Определяет инвариантный скелет теста:
- *   Run() → Setup() → GenerateSignals() → PrepareMatrix() → Upload()
- *         → Execute() → Validate() → SaveResults() → Teardown()
- *
- * Подклассы переопределяют Execute() и Validate() (pure virtual).
- * Хуки Setup/SaveResults/Teardown — опциональны (default: пустые).
- *
- * GoF Template Method:
- *   - Run()    — invariant (НЕ переопределять!)
- *   - Execute  — abstract (ОБЯЗАТЕЛЬНО переопределить)
- *   - Validate — abstract (ОБЯЗАТЕЛЬНО переопределить)
- *   - Setup/SaveResults/Teardown — hooks (опционально)
- *
- * GRASP Controller: StrategyTestBase координирует весь поток теста.
- * DIP: зависит от ISignalStrategy, не от конкретных классов.
- *
- * @date 2026-03-15
+ * @class StrategyTestBase
+ * @brief Базовый класс тестов антенной стратегии (GoF Template Method).
+ * @note Не публичный API. Запускается через test_base_strategy.hpp и др.
  */
 
 #if ENABLE_ROCM

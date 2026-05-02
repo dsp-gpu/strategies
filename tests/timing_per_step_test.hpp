@@ -1,22 +1,24 @@
 #pragma once
 
+// ============================================================================
+// timing_per_step_test.hpp — быстрый замер времени каждого Step (T4)
+//
+// ЧТО:    TimingPerStepTest: один прогон GEMM / WindowFFT / OneMax /
+//         AllMaxima / MinMax / FullProcess через hipEvent.
+//         Выводит таблицу в ConsoleOutput + сохраняет JSON для Python.
+// ЗАЧЕМ:  Быстрый «срез» производительности без длинного бенчмарка.
+//         Используется для сравнения «до/после» оптимизации шага.
+// ПОЧЕМУ: Отличие от StrategiesProfilingBenchmark: один прогон (не n_runs),
+//         нет ProfilingFacade — прямой hipEvent + таблица в консоли.
+//         JSON экспорт для test_timing_analysis.py в Python.
+//
+// История: Создан: 2026-03-15
+// ============================================================================
+
 /**
- * @file timing_per_step_test.hpp
- * @brief TimingPerStepTest — измерение времени каждого Step (T4)
- *
- * Цель: получить таблицу GPU-времени по каждому шагу для дальнейшей
- * оптимизации кода (TestStrategia.md §Тест измерения времени).
- *
- * Отличие от StrategiesProfilingBenchmark:
- *   - Один прогон (не n_runs итераций) — быстрый срез
- *   - Результат — таблица в консоли (ms/step)
- *   - Данные экспортируются в JSON для анализа в Python (test_timing_analysis.py)
- *
- * Вывод:
- *   ConsoleOutput → таблица шагов
- *   JSON → Results/strategies/timing_{signal}.json
- *
- * @date 2026-03-15
+ * @class TimingPerStepTest
+ * @brief Быстрый замер GPU-времени каждого шага pipeline (T4).
+ * @note Не публичный API. Запускается отдельно при оптимизации.
  */
 
 #if ENABLE_ROCM

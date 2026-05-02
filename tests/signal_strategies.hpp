@@ -1,19 +1,26 @@
 #pragma once
 
+// ============================================================================
+// signal_strategies.hpp — конкретные стратегии генерации сигнала (GoF Strategy)
+//
+// ЧТО:    4 реализации ISignalStrategy:
+//           SinSignalStrategy    — синус (fdev=0)
+//           LfmNoDelayStrategy   — ЛЧМ без задержек
+//           LfmWithDelayStrategy — ЛЧМ + линейные задержки (tau_step)
+//           LfmFarrowStrategy    — ЛЧМ + дробные задержки LchFarrowROCm
+// ЗАЧЕМ:  Каждая стратегия инкапсулирует логику генерации и передаёт
+//         GPU-указатель d_S в тест. Тест не знает как создан сигнал.
+// ПОЧЕМУ: OCP (SOLID): новый тип сигнала = новый класс + строка в Factory,
+//         без изменения StrategyTestBase или ISignalStrategy.
+//         LfmFarrowStrategy использует LchFarrowROCm (субсэмпловые задержки).
+//
+// История: Создан: 2026-03-15
+// ============================================================================
+
 /**
  * @file signal_strategies.hpp
- * @brief Конкретные стратегии генерации сигналов (GoF Strategy pattern)
- *
- * Реализации ISignalStrategy для 4 вариантов сигнала:
- *
- *   SinSignalStrategy      — синус (fdev=0, tau_step=0)
- *   LfmNoDelayStrategy     — ЛЧМ без задержек (fdev=90кГц, tau_step=0)
- *   LfmWithDelayStrategy   — ЛЧМ с линейными задержками (tau_step>0)
- *   LfmFarrowStrategy      — ЛЧМ + дробные задержки через LchFarrowROCm
- *
- * OCP: добавление нового типа сигнала = новый класс здесь + строка в Factory.
- *
- * @date 2026-03-15
+ * @brief Конкретные реализации ISignalStrategy для 4 вариантов сигнала.
+ * @note Не публичный API. Создаются через SignalStrategyFactory.
  */
 
 #if ENABLE_ROCM

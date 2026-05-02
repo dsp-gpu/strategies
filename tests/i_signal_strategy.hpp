@@ -1,20 +1,23 @@
 #pragma once
 
+// ============================================================================
+// i_signal_strategy.hpp — интерфейс генерации сигнала для тестов (GoF Strategy)
+//
+// ЧТО:    ISignalStrategy (pure virtual interface) + SignalData (struct).
+//         Метод Generate(backend, params) → SignalData{d_S, n_ant, n_samples}.
+// ЗАЧЕМ:  Позволяет StrategyTestBase работать с любым типом входного сигнала
+//         (SIN / LFM / LFM+задержки / LFM+Farrow) без изменения кода теста.
+// ПОЧЕМУ: GoF Strategy + OCP (SOLID): новый тип сигнала = новый класс
+//         в signal_strategies.hpp + строка в factory. StrategyTestBase
+//         зависит только от ISignalStrategy (DIP).
+//
+// История: Создан: 2026-03-15
+// ============================================================================
+
 /**
- * @file i_signal_strategy.hpp
- * @brief ISignalStrategy — интерфейс стратегии генерации сигнала (GoF Strategy)
- *
- * Паттерн Strategy (GoF): различные алгоритмы генерации сигнала
- * (SIN / LFM / LFM+задержки / LFM+Farrow) взаимозаменяемы без изменения
- * клиентского кода (StrategyTestBase).
- *
- * OCP (SOLID): добавить новый тип сигнала = добавить новый класс,
- *              НЕ изменяя ISignalStrategy или StrategyTestBase.
- *
- * DIP (SOLID): StrategyTestBase зависит от абстракции ISignalStrategy,
- *              не от конкретных SignalStrategies.
- *
- * @date 2026-03-15
+ * @class ISignalStrategy
+ * @brief Интерфейс стратегии генерации входного сигнала на GPU (GoF Strategy).
+ * @note Не публичный API. Реализации — в signal_strategies.hpp.
  */
 
 #if ENABLE_ROCM

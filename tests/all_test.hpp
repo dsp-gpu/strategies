@@ -1,16 +1,23 @@
 #pragma once
 
+// ============================================================================
+// all_test.hpp — точка входа в тесты модуля strategies
+//
+// ЧТО:    Агрегирует все тесты strategies: pipeline, step-profiling,
+//         benchmark-streams, base-strategy (OOP/SOLID), debug-steps.
+// ЗАЧЕМ:  Единственный файл, который нужно подключить в src/main.cpp для
+//         запуска всех тестов модуля. Выключение теста = закомментировать
+//         одну строку include.
+// ПОЧЕМУ: Следует правилу 15: main.cpp не вызывает тесты напрямую, только
+//         через all_test.hpp каждого модуля.
+//
+// История: Создан: 2026-03-07
+// ============================================================================
+
 /**
  * @file all_test.hpp
- * @brief Entry point for strategies module tests
- *
- * Include this from src/main.cpp to run strategies tests.
- *
- * Usage in main.cpp:
- *   #include "modules/strategies/tests/all_test.hpp"
- *   strategies_all_test::run();
- *
- * @date 2026-03-07
+ * @brief Entry point for strategies module tests.
+ * @note Не публичный API. Подключается из src/main.cpp.
  */
 
 #include "test_strategies_pipeline.hpp"

@@ -1,22 +1,23 @@
 #pragma once
 
+// ============================================================================
+// base_strategy_test.hpp — полный pipeline тест AntennaProcessor (T1)
+//
+// ЧТО:    BaseStrategyTest: Execute() запускает process_full(),
+//         Validate() проверяет one_max / частоту / dynamic_range_dB.
+// ЗАЧЕМ:  Основной «smoke»-тест стратегии — проверяет корректность
+//         полного прохода pipeline от сигнала до спектра и поиска пика.
+// ПОЧЕМУ: Наследует StrategyTestBase (Template Method, GoF): подкласс
+//         реализует только Execute+Validate, инфраструктура — в базе.
+//         Порог dynamic_range > 20 dB обеспечивает качество сигнала.
+//
+// История: Создан: 2026-03-15
+// ============================================================================
+
 /**
- * @file base_strategy_test.hpp
- * @brief BaseStrategyTest — полный pipeline тест (T1)
- *
- * GRASP Controller: координирует полный прогон AntennaProcessor pipeline.
- * Наследует StrategyTestBase (Template Method), реализует Execute + Validate.
- *
- * Execute():
- *   proc.process(d_S_, d_W_) → AntennaResult
- *
- * Validate():
- *   1. result.one_max не пустой
- *   2. Найденная частота ≈ f0_hz (±2 бина)
- *   3. dynamic_range_dB > kMinDynamicRangeDb (20 дБ)
- *   4. Статистика по debug-точкам собрана (если debug_mode=true)
- *
- * @date 2026-03-15
+ * @class BaseStrategyTest
+ * @brief Полный pipeline тест AntennaProcessor (T1).
+ * @note Не публичный API. Запускается через test_base_strategy.hpp.
  */
 
 #if ENABLE_ROCM

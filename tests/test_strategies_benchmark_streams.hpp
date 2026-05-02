@@ -1,20 +1,23 @@
 #pragma once
 
+// ============================================================================
+// test_strategies_benchmark_streams.hpp — benchmark: 1 stream vs 3 streams
+//
+// ЧТО:    run_benchmark_streams(backend): сравнивает время post-FFT сценариев
+//         в последовательном режиме (1 поток) и параллельном (3 потока).
+//         n_ant=16, n_samples=512, N_WARMUP=3, N_RUNS=20.
+// ЗАЧЕМ:  Определяет реальный выигрыш от параллельного запуска
+//         Step2.1 (OneMax) + Step2.2 (AllMaxima) + Step2.3 (GlobalMinMax).
+// ПОЧЕМУ: На малых размерах (n_ant=16) накладные расходы на 3 потока могут
+//         превысить выигрыш. Тест нужен для обоснования выбора стратегии.
+//
+// История: Создан: 2026-03-12
+// ============================================================================
+
 /**
  * @file test_strategies_benchmark_streams.hpp
- * @brief Benchmark: 1 stream vs 3 streams for post-FFT scenarios
- *
- * Compares execution time of do_run_post_fft_scenarios (sequential, 1 stream)
- * vs do_run_post_fft_parallel (parallel, 3 streams) for Step2.1 + Step2.2 + Step2.3.
- *
- * Test setup:
- *   - AntennaProcessorTest subclass to access protected step methods
- *   - n_ant = 16, n_samples = 512 (small, repeatable)
- *   - N_WARMUP = 3, N_RUNS = 20 — average time per run
- *
- * IMPORTANT: ROCm-only.
- *
- * @date 2026-03-12
+ * @brief Benchmark: 1 stream vs 3 streams для post-FFT шагов.
+ * @note Не публичный API. Подключается через all_test.hpp.
  */
 
 #if ENABLE_ROCM

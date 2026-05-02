@@ -1,13 +1,24 @@
 #pragma once
 
+// ============================================================================
+// signal_strategy_factory.hpp — фабрика стратегий сигнала (GoF Factory Method)
+//
+// ЧТО:    SignalStrategyFactory::Create(SignalVariant) →
+//         unique_ptr<ISignalStrategy>.
+// ЗАЧЕМ:  Централизованное создание стратегий по значению enum.
+//         Клиентский код (StrategyTestBase, run_single) не зависит
+//         от конкретных классов реализаций.
+// ПОЧЕМУ: GoF Factory Method: Create() — единственное место привязки
+//         SignalVariant → конкретный класс. OCP: новый вариант = только
+//         новый класс в signal_strategies.hpp + один кейс в switch.
+//
+// История: Создан: 2026-03-15
+// ============================================================================
+
 /**
- * @file signal_strategy_factory.hpp
- * @brief SignalStrategyFactory — Factory Method (GoF)
- *
- * Централизованное создание ISignalStrategy по SignalVariant.
- * OCP: новый вариант = добавить кейс в switch + новый класс в signal_strategies.hpp.
- *
- * @date 2026-03-15
+ * @class SignalStrategyFactory
+ * @brief Фабрика стратегий генерации сигнала (GoF Factory Method).
+ * @note Не публичный API. Используется внутри tests/strategies.
  */
 
 #if ENABLE_ROCM

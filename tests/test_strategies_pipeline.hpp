@@ -1,20 +1,24 @@
 #pragma once
 
+// ============================================================================
+// test_strategies_pipeline.hpp — интеграционный тест AntennaProcessor pipeline
+//
+// ЧТО:    test_full_pipeline(backend): 5 антенн, 8000 отсчётов, f0=2 МГц.
+//         test_external_weights(backend): проверяет SetExternalWeights +
+//         process_full_managed_w (W загружается через managed буфер).
+// ЗАЧЕМ:  Основной интеграционный тест — подтверждает корректность всей
+//         цепочки: генерация сигнала → GEMM → FFT → OneMax / AllMaxima / MinMax.
+// ПОЧЕМУ: Первый тест был написан как «быстрая проверка связки модулей».
+//         test_external_weights добавлен при реализации managed W буфера
+//         для API без явной передачи d_W в каждый вызов.
+//
+// История: Создан: 2026-03-07
+// ============================================================================
+
 /**
  * @file test_strategies_pipeline.hpp
- * @brief C++ test for AntennaProcessor pipeline (strategies module)
- *
- * Test scenario:
- *   1. Generate 5-antenna signal via FormSignalGeneratorROCm
- *   2. Generate Delay-and-sum W matrix
- *   3. Run full pipeline via AntennaProcessorTest
- *   4. Verify:
- *      - GEMM output shape
- *      - FFT output shape
- *      - Step2.1 finds the peak near f0=2MHz
- *      - Step2.3 min < max
- *
- * @date 2026-03-07
+ * @brief Интеграционный тест полного pipeline AntennaProcessor.
+ * @note Не публичный API. Подключается через all_test.hpp.
  */
 
 #if ENABLE_ROCM

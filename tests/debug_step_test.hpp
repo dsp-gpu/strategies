@@ -1,29 +1,23 @@
 #pragma once
 
+// ============================================================================
+// debug_step_test.hpp — пошаговый тест каждого Step (T2)
+//
+// ЧТО:    DebugStepTest: вызывает каждый шаг AntennaProcessorTest отдельно
+//         (step_1..step_6_3) и логирует промежуточные результаты.
+// ЗАЧЕМ:  Позволяет диагностировать конкретный шаг pipeline при падении;
+//         при save_to_files=true — сохраняет d_X / спектр для анализа в Python.
+// ПОЧЕМУ: Наследует StrategyTestBase (Template Method, GoF). Шаги вызываются
+//         последовательно через AntennaProcessorTest (protected accessor).
+//         Используется при отладке, не в CI.
+//
+// История: Создан: 2026-03-15
+// ============================================================================
+
 /**
- * @file debug_step_test.hpp
- * @brief DebugStepTest — пошаговый тест каждого Step (T2)
- *
- * Использует AntennaProcessorTest для вызова каждого шага по отдельности.
- * Опционально сохраняет промежуточные данные в файлы (params.save_to_files).
- *
- * Порядок шагов:
- *   Step 1: debug input stats     (pre_input)
- *   Step 2: GEMM                  (X = W × S)
- *   Step 3: debug post-GEMM stats
- *   Step 4: Window + FFT
- *   Step 5: debug post-FFT stats
- *   Step 6.1: OneMax + Parabola
- *   Step 6.2: AllMaxima
- *   Step 6.3: GlobalMinMax
- *
- * Валидация:
- *   - GEMM output: X.size() == n_ant * n_samples
- *   - FFT peak бин: ≈ round(f0_hz / bin_hz)
- *   - OneMax refined_freq_hz ≈ f0_hz (±2 бина)
- *   - MinMax: max >= min
- *
- * @date 2026-03-15
+ * @class DebugStepTest
+ * @brief Пошаговый тест AntennaProcessor — каждый Step отдельно (T2).
+ * @note Не публичный API. Запускается через test_debug_steps.hpp.
  */
 
 #if ENABLE_ROCM

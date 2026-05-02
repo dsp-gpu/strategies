@@ -1,22 +1,27 @@
 #pragma once
-#if ENABLE_ROCM
+
+// ============================================================================
+// test_strategies_step_profiling.hpp — GPU profiling каждого шага pipeline
+//
+// ЧТО:    run_step_profiling(backend): замер step1(GEMM) / step2(Window+FFT) /
+//         step3(OneMax+Parabola) / step4(GlobalMinMax) / step5(FullProcess)
+//         через hipEvent. n_ant=10, n_samples=16384, warmup=10, runs=20.
+// ЗАЧЕМ:  Профилирование каждого шага в изоляции для точного определения
+//         узкого места в pipeline без помех от соседних шагов.
+// ПОЧЕМУ: BatchRecord на каждый шаг (W1: меньше contention) → WaitEmpty →
+//         ExportJsonAndMarkdown (правило 06). Мигрировано с GPUProfiler
+//         на ProfilingFacade v2 в Phase D (2026-04-23).
+//
+// История: Создан: 2026-03-07; мигрирован на ProfilingFacade v2: 2026-04-23
+// ============================================================================
 
 /**
  * @file test_strategies_step_profiling.hpp
- * @brief AntennaProcessor — GPU profiling per pipeline step
- *
- * Measures each pipeline step independently via hipEvent (GPU hardware timer):
- *   step1 = GEMM (hipBLAS)
- *   step2 = Window+FFT+Magnitudes (hamming_pad_fused + hipFFT + compute_magnitudes)
- *   step3 = OneMax+Parabola (one_max_no_phase kernel)
- *   step4 = GlobalMinMax (global_minmax kernel)
- *   step5 = Full process() — total pipeline wall-clock
- *
- * All timing via ProfilingFacade::BatchRecord (one batch per step) → WaitEmpty
- * + ExportJsonAndMarkdown (rule 06). Pattern: fm_correlator/test_fm_step_profiling.hpp
- *
- * @date 2026-03-07 (migrated to ProfilingFacade v2: 2026-04-23, Phase D)
+ * @brief GPU профилирование каждого шага AntennaProcessor в изоляции.
+ * @note Не публичный API. Подключается при необходимости профилирования.
  */
+
+#if ENABLE_ROCM
 
 #include <algorithm>
 #include <chrono>

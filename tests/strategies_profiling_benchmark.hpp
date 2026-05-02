@@ -1,22 +1,25 @@
 #pragma once
 
+// ============================================================================
+// strategies_profiling_benchmark.hpp — GPU профилирование per Step (T3)
+//
+// ЧТО:    StrategiesProfilingBenchmark: измеряет GEMM / WindowFFT / OneMax /
+//         AllMaxima / MinMax / FullProcess через hipEvent + ProfilingFacade v2.
+//         n_warmup прогревочных + n_runs замерных итераций → BatchRecord.
+// ЗАЧЕМ:  Точный GPU-замер каждого шага pipeline для оптимизации.
+//         BatchRecord (W1) снижает contention очереди ProfilingFacade.
+//         Экспорт через WaitEmpty → ExportJsonAndMarkdown (правило 06).
+// ПОЧЕМУ: Наследует StrategyTestBase (Template Method, GoF) — переиспользует
+//         инфраструктуру Setup/GenerateSignals/PrepareMatrix.
+//         Мигрировано с GPUProfiler на ProfilingFacade v2 в Phase D.
+//
+// История: Создан: 2026-03-15; мигрирован на ProfilingFacade v2: 2026-04-23
+// ============================================================================
+
 /**
- * @file strategies_profiling_benchmark.hpp
- * @brief StrategiesProfilingBenchmark — GPU profiling per Step (T3)
- *
- * Измеряет время каждого шага pipeline через hipEvent + ProfilingFacade v2.
- * Реализует паттерн GpuBenchmarkBase (Template Method) для ROCm.
- *
- * Прогоны:
- *   n_warmup прогревочных итераций (без записи)
- *   n_runs   замерных итераций → собираются в вектор и одним
- *            ProfilingFacade::BatchRecord (W1: меньше contention,
- *            чем N × Record, см. Round 3 review).
- *
- * Вывод через ProfilingFacade:
- *   WaitEmpty() → ExportJsonAndMarkdown(<dir>/<name>.json|.md)
- *
- * @date 2026-03-15 (migrated to ProfilingFacade v2: 2026-04-23, Phase D)
+ * @class StrategiesProfilingBenchmark
+ * @brief GPU профилирование каждого шага AntennaProcessor pipeline (T3).
+ * @note Не публичный API. Запускается отдельно (не в CI).
  */
 
 #if ENABLE_ROCM
