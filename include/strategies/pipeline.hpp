@@ -95,6 +95,7 @@ public:
   /**
    * @brief Выполнить все шаги в порядке entries_, скипая отключённые (IsEnabled==false).
    * @param ctx Shared context: kernels, streams, buffers, result.
+   *   @test { values=["valid_backend"] }
    *
    * Для PARALLEL-группы все шаги запускаются последовательно (они стоят на разных
    * streams и параллелятся на GPU), затем hipStreamSynchronize по всем streams
@@ -128,6 +129,7 @@ public:
    *
    * Используется в тестах (например, AntennaProcessorTest) для прямого
    * вызова конкретного шага без перестройки pipeline'а.
+   *   @test_check (result == nullptr) || (std::strcmp(result->Name(), name) == 0)
    */
   IPipelineStep* FindStep(const char* name) const {
     for (auto& s : all_steps_) {

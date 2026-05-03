@@ -81,7 +81,12 @@ class DebugStatsStep : public PipelineStepBase {
 public:
   explicit DebugStatsStep(DebugPoint point) : point_(point) {}
 
-  /// Имя зависит от DebugPoint: DebugStats_{PreInput|PostGEMM|PostFFT}.
+  /**
+   * @brief Возвращает имя шага для логирования (зависит от DebugPoint, переданного в конструкторе).
+   *
+   * @return Одна из C-строк: "DebugStats_PreInput" / "DebugStats_PostGEMM" / "DebugStats_PostFFT".
+   *   @test_check std::string(result).rfind("DebugStats_", 0) == 0
+   */
   const char* Name() const override {
     switch (point_) {
       case DebugPoint::PRE_INPUT: return "DebugStats_PreInput";
@@ -91,7 +96,15 @@ public:
     return "DebugStats_Unknown";
   }
 
-  /// Включён если StatPreset для соответствующей точки != NONE.
+  /**
+   * @brief Активен если StatPreset для соответствующей DebugPoint != NONE в конфиге.
+   *
+   * @param cfg Конфиг pipeline'а (debug_stats_pre_input/post_gemm/post_fft).
+   *   @test_ref AntennaProcessorConfig
+   *
+   * @return true если соответствующий StatPreset включён, иначе false.
+   *   @test_check result == (corresponding StatPreset != NONE)
+   */
   bool IsEnabled(const AntennaProcessorConfig& cfg) const override {
     switch (point_) {
       case DebugPoint::PRE_INPUT: return cfg.pre_input_stats != StatPreset::NONE;
@@ -104,6 +117,7 @@ public:
   /**
    * @brief Считать статистики (+median по флагу) в точке point_, записать в result + checkpoint.
    * @param ctx Shared context: stats_processor, checkpoint, нужные буферы и events.
+   *   @test { values=["valid_backend"] }
    *
    * Для POST_GEMM/POST_FFT ставит hipStreamWaitEvent на debug-stream
    * перед запуском вычислений — гарантия что данные готовы. PRE_INPUT

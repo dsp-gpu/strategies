@@ -66,35 +66,99 @@ class ICheckpointSave {
 public:
   virtual ~ICheckpointSave() = default;
 
-  /// C1: сохранить входной сигнал d_S [n_ant × n_samples] complex<float>.
+  /**
+   * @brief Checkpoint C1: фиксирует входной сигнал d_S перед GEMM.
+   *
+   * @param d_data GPU-указатель на complex<float>[n_ant × n_samples].
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   * @param n_ant Число антенн (строк в d_S).
+   * @param n_samples Число отсчётов на антенну.
+   *   @test { range=[100..1300000], value=6000 }
+   * @param sample_rate Частота дискретизации, Гц.
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
+   * @param gpu_id Идентификатор GPU (для multi-GPU).
+   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   */
   virtual void save_c1_signal(
       const void* d_data, uint32_t n_ant, uint32_t n_samples,
       float sample_rate, int gpu_id) = 0;
 
-  /// C1: сохранить матрицу весов d_W [n_ant × n_ant] complex<float>.
+  /**
+   * @brief Checkpoint C1: фиксирует матрицу весов d_W перед GEMM.
+   *
+   * @param d_weights GPU-указатель на complex<float>[n_ant × n_ant].
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   * @param n_ant Размер матрицы (квадратная n_ant × n_ant).
+   * @param gpu_id Идентификатор GPU (для multi-GPU).
+   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   */
   virtual void save_c1_weights(
       const void* d_weights, uint32_t n_ant, int gpu_id) = 0;
 
-  /// C2: сохранить результат GEMM d_X [n_ant × n_samples] (после X = W·S).
+  /**
+   * @brief Checkpoint C2: фиксирует результат GEMM (X = W·S) перед FFT.
+   *
+   * @param d_X GPU-указатель на complex<float>[n_ant × n_samples] — результат GEMM.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   * @param n_ant Число антенн.
+   * @param n_samples Число отсчётов на антенну.
+   *   @test { range=[100..1300000], value=6000 }
+   * @param sample_rate Частота дискретизации, Гц.
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
+   * @param gpu_id Идентификатор GPU.
+   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   */
   virtual void save_c2_data(
       const void* d_X, uint32_t n_ant, uint32_t n_samples,
       float sample_rate, int gpu_id) = 0;
 
-  /// C2: сохранить пары pre/post-GEMM статистик (debug-точки 2.1 и 2.2).
+  /**
+   * @brief Checkpoint C2: фиксирует пары pre/post-GEMM статистик (Welford по beam'ам).
+   *
+   * @param pre_stats Указатель на StatisticsResult[n_ant] до GEMM (точка 2.1).
+   * @param post_stats Указатель на StatisticsResult[n_ant] после GEMM (точка 2.2).
+   * @param n_ant Число beam'ов в массивах.
+   * @param gpu_id Идентификатор GPU.
+   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   */
   virtual void save_c2_stats(
       const statistics::StatisticsResult* pre_stats,
       const statistics::StatisticsResult* post_stats,
       uint32_t n_ant, int gpu_id) = 0;
 
-  /// C3: сохранить полный спектр [n_ant × nFFT] complex<float> после Window+FFT.
+  /**
+   * @brief Checkpoint C3: фиксирует полный спектр после Window+FFT (до post-FFT шагов).
+   *
+   * @param d_spectrum GPU-указатель на complex<float>[n_ant × nFFT].
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   * @param n_ant Число beam'ов.
+   * @param nFFT Размер FFT (степень двойки).
+   *   @test { range=[8..4194304], value=1024, pattern=power_of_2 }
+   * @param gpu_id Идентификатор GPU.
+   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   */
   virtual void save_c3_spectrum(
       const void* d_spectrum, uint32_t n_ant, uint32_t nFFT, int gpu_id) = 0;
 
-  /// C3: сохранить per-beam MinMax-результаты сценария GLOBAL_MINMAX.
+  /**
+   * @brief Checkpoint C3: фиксирует per-beam MinMax-результаты (сценарий GLOBAL_MINMAX).
+   *
+   * @param results Указатель на MinMaxResult[n_ant] (per-beam global min/max).
+   * @param n_ant Число beam'ов в массиве.
+   * @param gpu_id Идентификатор GPU.
+   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   */
   virtual void save_c3_minmax(
       const MinMaxResult* results, uint32_t n_ant, int gpu_id) = 0;
 
-  /// C4: сохранить per-beam OneMax+Parabola-результаты сценария ONE_MAX_PARABOLA.
+  /**
+   * @brief Checkpoint C4: фиксирует per-beam OneMax-результаты (сценарий ONE_MAX_PARABOLA).
+   *
+   * @param results Указатель на OneMaxParabolaLite[n_ant] (per-beam пик с параболической интерполяцией).
+   * @param n_ant Число beam'ов в массиве.
+   * @param gpu_id Идентификатор GPU.
+   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   */
   virtual void save_c4_one_max(
       const OneMaxParabolaLite* results, uint32_t n_ant, int gpu_id) = 0;
 };

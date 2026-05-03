@@ -67,7 +67,14 @@ namespace strategies {
  */
 class PipelineBuilder {
 public:
-  /// Добавить sequential-шаг (выполняется по очереди после предыдущих).
+  /**
+   * @brief Добавляет sequential-шаг (выполняется по очереди после предыдущих).
+   *
+   * @param step Уникальное владение IPipelineStep; builder перенимает.
+   *
+   * @return *this для fluent-цепочки.
+   *   @test_check &result == this
+   */
   PipelineBuilder& add(std::unique_ptr<IPipelineStep> step) {
     Pipeline::Entry entry;
     entry.type = Pipeline::Entry::SEQUENTIAL;
@@ -77,17 +84,29 @@ public:
     return *this;
   }
 
-  /// Добавить шаг ТОЛЬКО если condition==true (compile-time/host-side фильтр).
-  /// Отличие от IPipelineStep::IsEnabled: при condition==false шаг даже
-  /// не создаётся в Pipeline → экономия памяти на отключённых тяжёлых шагах.
+  /**
+   * @brief Добавляет шаг ТОЛЬКО если condition==true; иначе шаг уничтожается до build().
+   *
+   * @param condition Compile-time/host-side фильтр (отличается от IsEnabled — здесь шаг даже не создаётся в Pipeline).
+   * @param step Уникальное владение IPipelineStep.
+   *
+   * @return *this для fluent-цепочки.
+   *   @test_check &result == this
+   */
   PipelineBuilder& add_if(bool condition, std::unique_ptr<IPipelineStep> step) {
     if (condition) return add(std::move(step));
     return *this;
   }
 
-  /// Добавить parallel-группу: шаги [i] запускаются на streams[i] параллельно.
-  /// Pipeline::Execute сделает hipStreamSynchronize по ВСЕМ streams группы
-  /// перед переходом к следующему Entry — синхронизация автоматическая.
+  /**
+   * @brief Добавляет parallel-группу: шаги [i] запускаются на streams[i] параллельно. Sync — после группы.
+   *
+   * @param group_steps Шаги группы; запускаются параллельно на разных stream'ах.
+   * @param streams Соответствующие streams (по одному на шаг); Pipeline::Execute синхронизирует все после.
+   *
+   * @return *this для fluent-цепочки.
+   *   @test_check &result == this
+   */
   PipelineBuilder& add_parallel(
       std::vector<std::unique_ptr<IPipelineStep>> group_steps,
       std::vector<hipStream_t> streams) {
@@ -107,8 +126,12 @@ public:
     return *this;
   }
 
-  /// Финализация: создать Pipeline и перенести в него всё накопленное.
-  /// После build() Builder можно разрушить (внутренние vector'ы пусты).
+  /**
+   * @brief Финализирует builder и создаёт Pipeline (immutable). После — builder можно разрушить.
+   *
+   * @return unique_ptr<Pipeline> с перемещённым all_steps_/entries_/parallel_groups_.
+   *   @test_check result != nullptr
+   */
   std::unique_ptr<Pipeline> build() {
     auto p = std::make_unique<Pipeline>();
     p->all_steps_ = std::move(steps_);

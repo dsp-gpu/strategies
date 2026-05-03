@@ -71,8 +71,11 @@ public:
   /**
    * @brief Запустить полный pipeline антенной обработки.
    * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
    * @param d_W Матрица весов [n_ant × n_ant] complex<float> на GPU.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
    * @return Агрегированный результат: статистики, пики, MinMax, метрики производительности.
+   *   @test_check result.success == true (для валидных d_S и d_W)
    */
   virtual AntennaResult process(const void* d_S, const void* d_W) = 0;
 
@@ -87,9 +90,19 @@ public:
   /// Включить debug-режим (D2H копии в debug-точках для CPU-валидации).
   virtual void set_debug_mode(bool enabled) = 0;
 
-  /// Текущий конфиг pipeline'а (read-only).
+  /**
+   * @brief Возвращает текущий конфиг pipeline'а (n_ant, n_samples, scenario_mode, ...).
+   *
+   * @return Const-ссылка на хранимый AntennaProcessorConfig.
+   *   @test_check result.n_ant > 0 && result.n_samples > 0
+   */
   virtual const AntennaProcessorConfig& config() const = 0;
-  /// Идентификатор GPU, на котором работает процессор (для multi-GPU отчётов).
+  /**
+   * @brief Возвращает идентификатор GPU, на котором работает процессор.
+   *
+   * @return GPU id (0..GetDeviceCount()-1).
+   *   @test_check result >= 0
+   */
   virtual int gpu_id() const = 0;
 };
 

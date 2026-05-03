@@ -74,14 +74,29 @@ namespace strategies {
  */
 class WindowFftStep : public PipelineStepBase {
 public:
+  /**
+   * @brief Возвращает имя шага для логирования и поиска через Pipeline::FindStep.
+   *
+   * @return C-строка "WindowFFT" (статический литерал).
+   *   @test_check std::string(result) == "WindowFFT"
+   */
   const char* Name() const override { return "WindowFFT"; }
+  /**
+   * @brief Всегда активен — обязательный шаг (window + FFT + magnitudes).
+   *
+   *
+   * @return Всегда `true`.
+   *   @test_check result == true
+   */
   bool IsEnabled(const AntennaProcessorConfig&) const override { return true; }
 
   /**
    * @brief Запустить memset → fused window+pad → FFT → magnitudes, записать event_fft_done.
    * @param ctx Shared context: kBufX, kBufHammingWindow, kBufFftInput, kBufSpectrum, kBufMagnitudes,
+   *   @test { values=["valid_backend"] }
    *            fft_plan, complex_to_mag, stream_main, event_fft_done.
    * @throws std::runtime_error при ошибке любого kernel/hipfft вызова.
+   *   @test_check throws on hipfftExecC2C != HIPFFT_SUCCESS || hipModuleLaunchKernel != hipSuccess
    */
   void Execute(PipelineContext& ctx) override {
     uint32_t n_ant = ctx.cfg->n_ant;

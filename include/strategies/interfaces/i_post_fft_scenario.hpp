@@ -92,7 +92,12 @@ public:
       hipStream_t stream) = 0;
 #endif
 
-  /// Человекочитаемое имя сценария (для профайлера и логов).
+  /**
+   * @brief Возвращает человекочитаемое имя сценария (для профайлера и логов).
+   *
+   * @return C-строка имени (например, "OneMaxParabola" / "AllMaxima" / "GlobalMinMax").
+   *   @test_check result != nullptr && std::strlen(result) > 0
+   */
   virtual const char* name() const = 0;
 };
 

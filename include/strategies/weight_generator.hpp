@@ -83,9 +83,11 @@ public:
   /**
    * @brief Сгенерировать матрицу весов Delay-and-Sum.
    * @param params Количество антенн, частота, базовая задержка и шаг.
+   *   @test_ref WeightParams
    * @return Flat row-major матрица [n_ant × n_ant] complex<float>.
    *
    * W[beam][ant] = exp(-j·2π·f0·τ[ant]) / √N_ant, τ[ant] = tau_base + ant·tau_step.
+   *   @test_check result.size() == params.n_ant * params.n_ant
    */
   static std::vector<std::complex<float>> generate_delay_and_sum(
       const WeightParams& params);
@@ -93,6 +95,7 @@ public:
   /**
    * @brief Залить матрицу весов на GPU через IBackend.
    * @param backend Указатель на drv_gpu_lib::IBackend (передаётся как void*).
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
    * @param weights Flat [n_ant × n_ant] complex<float> матрица.
    * @return Device-pointer (caller обязан освободить через backend->Free()).
    */

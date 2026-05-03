@@ -109,7 +109,11 @@ struct PipelineContext {
   AntennaResult* result = nullptr;
 
   // ── Helper accessors ──────────────────────────────────────────────────
-  /// Получить device-pointer буфера по enum-индексу (zero-overhead).
+  /**
+   * @brief Возвращает device-указатель буфера по enum-индексу (через BufferSet::Get).
+   *
+   * @param id Enum-индекс буфера (kBufX / kBufSpectrum / kBufMagnitudes / ...).
+   */
   void* buf(PipelineBuf id) const {
     return buffers->Get(static_cast<size_t>(id));
   }

@@ -112,6 +112,17 @@ public:
   AntennaProcessor_v1& operator=(const AntennaProcessor_v1&) = delete;
 
   // AntennaProcessor interface
+  /**
+   * @brief Запускает полный pipeline (Pipeline::Execute) на входе d_S/d_W; возвращает агрегированный результат.
+   *
+   * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   * @param d_W Матрица весов [n_ant × n_ant] complex<float> на GPU.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *
+   * @return Результат: статистики, пики (по сценарию), MinMax, метрики производительности.
+   *   @test_check result.success == true
+   */
   AntennaResult process(const void* d_S, const void* d_W) override;
 
   void set_scenario_mode(PostFftScenarioMode mode) override { cfg_.scenario_mode = mode; }
@@ -120,7 +131,19 @@ public:
   void set_post_fft_stats(StatisticsSet stats) override  { cfg_.post_fft_stats  = stats; }
   void set_debug_mode(bool enabled) override { cfg_.debug_mode = enabled; }
 
+  /**
+   * @brief Возвращает текущий конфиг pipeline'а (read-only).
+   *
+   * @return Const-ссылка на хранимый AntennaProcessorConfig.
+   *   @test_check result.n_ant > 0 && result.n_samples > 0
+   */
   const AntennaProcessorConfig& config() const override { return cfg_; }
+  /**
+   * @brief Возвращает идентификатор GPU, на котором работает процессор.
+   *
+   * @return GPU id (0..GetDeviceCount()-1).
+   *   @test_check result >= 0
+   */
   int gpu_id() const override;
 
   // Checkpoint setter

@@ -60,9 +60,23 @@ namespace strategies {
  */
 class OneMaxStep : public PipelineStepBase {
 public:
+  /**
+   * @brief Возвращает имя шага для логирования и поиска через Pipeline::FindStep.
+   *
+   * @return C-строка "OneMaxParabola" (статический литерал).
+   *   @test_check std::string(result) == "OneMaxParabola"
+   */
   const char* Name() const override { return "OneMaxParabola"; }
 
-  /// Включён в сценариях ALL_REQUIRED и ONE_MAX_PARABOLA.
+  /**
+   * @brief Активен в сценариях ALL_REQUIRED и ONE_MAX_PARABOLA (поиск одного максимума с параболической интерполяцией).
+   *
+   * @param cfg Конфиг pipeline'а (scenario_mode определяет активность).
+   *   @test_ref AntennaProcessorConfig
+   *
+   * @return true для ALL_REQUIRED / ONE_MAX_PARABOLA, иначе false.
+   *   @test_check result == (cfg.scenario_mode == PostFftScenarioMode::ALL_REQUIRED || cfg.scenario_mode == PostFftScenarioMode::ONE_MAX_PARABOLA)
+   */
   bool IsEnabled(const AntennaProcessorConfig& cfg) const override {
     return cfg.scenario_mode == PostFftScenarioMode::ALL_REQUIRED ||
            cfg.scenario_mode == PostFftScenarioMode::ONE_MAX_PARABOLA;
@@ -74,7 +88,9 @@ public:
   /**
    * @brief Запустить one_max_no_phase kernel, синхронизировать stream, D2H в result->one_max.
    * @param ctx Shared context: gpu_ctx, kBufMagnitudes, kBufSpectrum, kBufOneMaxResults, n_ant, nFFT, sample_rate.
+   *   @test { values=["valid_backend"] }
    * @throws std::runtime_error если hipModuleLaunchKernel вернул не hipSuccess.
+   *   @test_check throws on hipModuleLaunchKernel != hipSuccess
    */
   void Execute(PipelineContext& ctx) override {
     uint32_t n_ant = ctx.cfg->n_ant;

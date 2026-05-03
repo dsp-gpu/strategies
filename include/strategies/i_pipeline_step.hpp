@@ -69,10 +69,23 @@ struct AntennaProcessorConfig;
  */
 class IPipelineStep : public drv_gpu_lib::IGpuOperation {
 public:
-  /// Выполнить шаг на shared-контексте (kernels/streams/buffers/result).
+  /**
+   * @brief Выполнить шаг pipeline'а на разделяемом контексте (kernels/streams/buffers/result).
+   *
+   * @param ctx Контекст pipeline'а с доступом к backend, gpu_ctx, plan, streams, events.
+   *   @test { values=["valid_backend"] }
+   */
   virtual void Execute(PipelineContext& ctx) = 0;
 
-  /// true — шаг должен выполниться при текущем config (sceanrio_mode и т.д.).
+  /**
+   * @brief Возвращает признак активности шага по текущей конфигурации (host-side dispatch).
+   *
+   * @param cfg Конфиг (scenario_mode, флаги фич) — определяет, нужен ли шаг.
+   *   @test_ref AntennaProcessorConfig
+   *
+   * @return `true` — Pipeline вызовет Execute этого шага; `false` — пропустит.
+   *   @test_check result == true || result == false (зависит от cfg.scenario_mode)
+   */
   virtual bool IsEnabled(const AntennaProcessorConfig& cfg) const = 0;
 };
 
@@ -86,8 +99,15 @@ public:
 class PipelineStepBase : public IPipelineStep {
 public:
   // IGpuOperation defaults (pipeline steps don't use GpuContext directly)
+  /**
+   * @brief No-op: pipeline-шаги берут ресурсы из PipelineContext, а не из GpuContext.
+   *
+   */
   void Initialize(drv_gpu_lib::GpuContext&) override {}
   bool IsReady() const override { return true; }
+  /**
+   * @brief No-op: ресурсы pipeline-шагов освобождаются вместе с PipelineContext.
+   */
   void Release() override {}
 };
 

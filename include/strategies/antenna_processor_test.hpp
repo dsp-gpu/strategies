@@ -85,6 +85,10 @@ public:
 
   /**
    * @brief Step 0: Prepare input — store d_S, d_W pointers
+   * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   * @param d_W Матрица весов [n_ant × n_ant] complex<float> на GPU.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
    */
   void step_0_prepare_input(const void* d_S, const void* d_W) {
     d_S_ = d_S;
@@ -94,6 +98,7 @@ public:
   /**
    * @brief Step 1: Debug point 2.1 — stats on d_S
    * @return Statistics on input signal
+   *   @test_check result.pre_input_stats.size() == config().n_ant
    */
   AntennaResult step_1_debug_input() {
     AntennaResult result;
@@ -107,6 +112,7 @@ public:
   /**
    * @brief Step 2: GEMM — X = W * S
    * @return d_X copied to CPU [n_ant x n_samples] complex<float>
+   *   @test_check result.size() == config().n_ant * config().n_samples
    */
   std::vector<std::complex<float>> step_2_gemm() {
     do_gemm(d_S_, d_W_);
@@ -118,7 +124,9 @@ public:
   }
 
   /**
-   * @brief Step 3: Debug point 2.2 — stats on d_X
+   * @brief Step 3: Debug point 2.2 — stats on d_X (после GEMM)
+   * @return AntennaResult с post_gemm_stats — Welford по d_X.
+   *   @test_check result.post_gemm_stats.size() == config().n_ant
    */
   AntennaResult step_3_debug_post_gemm() {
     AntennaResult result;
@@ -132,6 +140,7 @@ public:
   /**
    * @brief Step 4: Window + FFT
    * @return d_spectrum copied to CPU [n_ant x nFFT] complex<float>
+   *   @test_check result.size() == config().n_ant * get_nFFT()
    */
   std::vector<std::complex<float>> step_4_window_fft() {
     do_window_fft();
@@ -143,7 +152,9 @@ public:
   }
 
   /**
-   * @brief Step 5: Debug point 2.3 — stats on |spectrum|
+   * @brief Step 5: Debug point 2.3 — stats on |spectrum| (после FFT)
+   * @return AntennaResult с post_fft_stats — Welford по магнитудам спектра.
+   *   @test_check result.post_fft_stats.size() == config().n_ant
    */
   AntennaResult step_5_debug_post_fft() {
     AntennaResult result;
@@ -155,7 +166,9 @@ public:
   }
 
   /**
-   * @brief Step 6.1: OneMax + Parabola (no phase)
+   * @brief Step 6.1: OneMax + Parabola (no phase) — временно ставит scenario_mode = ONE_MAX_PARABOLA.
+   * @return AntennaResult с one_max результатами per beam.
+   *   @test_check result.one_max.size() == config().n_ant
    */
   AntennaResult step_6_1_one_max_parabola() {
     auto saved = config().scenario_mode;
@@ -168,7 +181,9 @@ public:
   }
 
   /**
-   * @brief Step 6.2: AllMaxima
+   * @brief Step 6.2: AllMaxima — временно ставит scenario_mode = ALL_MAXIMA.
+   * @return AntennaResult с all_maxima.beams для всех антенн.
+   *   @test_check result.all_maxima.beams.size() == config().n_ant
    */
   AntennaResult step_6_2_all_maxima() {
     auto saved = config().scenario_mode;
@@ -181,7 +196,9 @@ public:
   }
 
   /**
-   * @brief Step 6.3: GlobalMinMax
+   * @brief Step 6.3: GlobalMinMax — временно ставит scenario_mode = GLOBAL_MINMAX.
+   * @return AntennaResult с min_max результатами per beam.
+   *   @test_check result.min_max.size() == config().n_ant
    */
   AntennaResult step_6_3_global_minmax() {
     auto saved = config().scenario_mode;
@@ -194,7 +211,9 @@ public:
   }
 
   /**
-   * @brief Full pipeline (all steps + all scenarios)
+   * @brief Full pipeline (all steps + all scenarios) — делегирует в AntennaProcessor_v1::process(d_S_, d_W_).
+   * @return Полный AntennaResult: статистики, пики, MinMax, метрики.
+   *   @test_check result.success == true
    */
   AntennaResult process_full() {
     return process(d_S_, d_W_);
@@ -205,6 +224,8 @@ public:
    *
    * Requires prior call to set_external_weights().
    * d_S must be set via step_0_prepare_input or step_0_signal_only.
+   * @return Полный AntennaResult с использованием внутренней managed-копии весов.
+   *   @test_check result.success == true
    */
   AntennaResult process_full_managed_w() {
     return process(d_S_, get_managed_weights_ptr());
@@ -215,6 +236,8 @@ public:
    *
    * Call after set_external_weights() to avoid re-uploading W on every frame.
    * Only updates d_S_; d_W_ is set to the internally managed GPU pointer.
+   * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU (новый кадр).
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
    */
   void step_0_signal_only(const void* d_S) {
     d_S_ = d_S;
@@ -222,6 +245,12 @@ public:
   }
 
   // Getters for test access
+  /**
+   * @brief Возвращает текущий размер FFT (nextPow2 + zero-padding); для test-доступа.
+   *
+   * @return nFFT — степень двойки, рассчитанная в do_window_fft().
+   *   @test_check result >= config().n_samples && (result & (result - 1)) == 0
+   */
   uint32_t test_get_nFFT() const { return get_nFFT(); }
 
 private:

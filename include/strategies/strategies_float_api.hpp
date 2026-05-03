@@ -93,8 +93,11 @@ public:
    * @param mags        Flat float magnitudes [n_ant * nFFT]
    * @param n_ant       Number of beams / antennas
    * @param nFFT        FFT size per beam
+   *   @test { range=[8..4194304], value=1024, pattern=power_of_2 }
    * @param sample_rate Sampling frequency [Hz]
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
    * @return Vector of OneMaxParabolaLite (one per beam)
+   *   @test_check result.size() == n_ant
    */
   std::vector<OneMaxParabolaLite> OneMaxParabolaFromFloat(
       const std::vector<float>& mags,
@@ -106,8 +109,11 @@ public:
    * @param mags        Flat float magnitudes [n_ant * nFFT]
    * @param n_ant       Number of beams / antennas
    * @param nFFT        FFT size per beam
+   *   @test { range=[8..4194304], value=1024, pattern=power_of_2 }
    * @param sample_rate Sampling frequency [Hz]
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
    * @return Vector of MinMaxResult (one per beam)
+   *   @test_check result.size() == n_ant
    */
   std::vector<MinMaxResult> GlobalMinMaxFromFloat(
       const std::vector<float>& mags,
@@ -118,13 +124,21 @@ public:
    *
    * @param mags                Flat float magnitudes [beam_count * nFFT]
    * @param beam_count          Number of beams
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
    * @param nFFT                FFT size per beam
+   *   @test { range=[8..4194304], value=1024, pattern=power_of_2 }
    * @param sample_rate         Sampling frequency [Hz]
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
    * @param dest                Output destination (CPU or GPU)
+   *   @test { size=[100..1300000], value=6000, unit="elements" }
    * @param search_start        First bin to search (default 1 to skip DC)
+   *   @test { range=[0..1000000], value=0 }
    * @param search_end          Last bin (0 = nFFT/2)
+   *   @test { range=[0..1300000], value=8192 }
    * @param max_maxima_per_beam Max number of maxima per beam
+   *   @test { range=[1..50000], value=128 }
    * @return AllMaximaResult with beams vector
+   *   @test_check result.beams.size() == beam_count
    */
   antenna_fft::AllMaximaResult AllMaximaFromMagnitudes(
       const std::vector<float>& mags,

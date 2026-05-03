@@ -52,13 +52,41 @@ namespace strategies {
  */
 class NullCheckpointSave final : public ICheckpointSave {
 public:
+  /**
+   * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
+   *
+   */
   void save_c1_signal(const void*, uint32_t, uint32_t, float, int) override {}
+  /**
+   * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
+   *
+   */
   void save_c1_weights(const void*, uint32_t, int) override {}
+  /**
+   * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
+   *
+   */
   void save_c2_data(const void*, uint32_t, uint32_t, float, int) override {}
+  /**
+   * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
+   *
+   */
   void save_c2_stats(const statistics::StatisticsResult*, const statistics::StatisticsResult*,
                      uint32_t, int) override {}
+  /**
+   * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
+   *
+   */
   void save_c3_spectrum(const void*, uint32_t, uint32_t, int) override {}
+  /**
+   * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
+   *
+   */
   void save_c3_minmax(const MinMaxResult*, uint32_t, int) override {}
+  /**
+   * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
+   *
+   */
   void save_c4_one_max(const OneMaxParabolaLite*, uint32_t, int) override {}
 };
 

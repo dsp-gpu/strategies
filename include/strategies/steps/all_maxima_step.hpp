@@ -58,9 +58,23 @@ namespace strategies {
  */
 class AllMaximaStep : public PipelineStepBase {
 public:
+  /**
+   * @brief Возвращает имя шага для логирования и поиска через Pipeline::FindStep.
+   *
+   * @return C-строка "AllMaxima" (статический литерал).
+   *   @test_check std::string(result) == "AllMaxima"
+   */
   const char* Name() const override { return "AllMaxima"; }
 
-  /// Включён в сценариях ALL_REQUIRED и ALL_MAXIMA.
+  /**
+   * @brief Активен в сценариях ALL_REQUIRED и ALL_MAXIMA (поиск всех локальных пиков).
+   *
+   * @param cfg Конфиг pipeline'а (scenario_mode определяет активность шага).
+   *   @test_ref AntennaProcessorConfig
+   *
+   * @return true для ALL_REQUIRED / ALL_MAXIMA, иначе false.
+   *   @test_check result == (cfg.scenario_mode == PostFftScenarioMode::ALL_REQUIRED || cfg.scenario_mode == PostFftScenarioMode::ALL_MAXIMA)
+   */
   bool IsEnabled(const AntennaProcessorConfig& cfg) const override {
     return cfg.scenario_mode == PostFftScenarioMode::ALL_REQUIRED ||
            cfg.scenario_mode == PostFftScenarioMode::ALL_MAXIMA;
@@ -69,6 +83,7 @@ public:
   /**
    * @brief Запустить AllMaximaPipelineROCm и записать .beams в result->all_maxima.
    * @param ctx Shared context: kBufMagnitudes, kBufSpectrum, n_ant, nFFT, sample_rate, maxima_limit.
+   *   @test { values=["valid_backend"] }
    */
   void Execute(PipelineContext& ctx) override {
     auto am_result = ctx.all_maxima_pipeline->Execute(

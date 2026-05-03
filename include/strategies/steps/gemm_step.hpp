@@ -64,13 +64,28 @@ namespace strategies {
  */
 class GemmStep : public PipelineStepBase {
 public:
+  /**
+   * @brief Возвращает имя шага для логирования и поиска через Pipeline::FindStep.
+   *
+   * @return C-строка "GEMM" (статический литерал).
+   *   @test_check std::string(result) == "GEMM"
+   */
   const char* Name() const override { return "GEMM"; }
+  /**
+   * @brief Всегда активен — обязательный шаг beamforming'а.
+   *
+   *
+   * @return Всегда `true`.
+   *   @test_check result == true
+   */
   bool IsEnabled(const AntennaProcessorConfig&) const override { return true; }
 
   /**
    * @brief Запустить hipblasCgemm и записать event_gemm_done.
    * @param ctx Shared context: hipblas_handle, d_S/d_W, kBufX, stream_main, event_gemm_done.
+   *   @test { values=["valid_backend"] }
    * @throws std::runtime_error если hipblasCgemm вернул не SUCCESS.
+   *   @test_check throws on hipblasCgemm != HIPBLAS_STATUS_SUCCESS
    */
   void Execute(PipelineContext& ctx) override {
     const int M = static_cast<int>(ctx.cfg->n_samples);
