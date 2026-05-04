@@ -354,8 +354,7 @@ inline void register_strategies_rocm(py::module_& m) {
       "  gemm = proc.step_2_gemm()\n"
       "  spectrum = proc.step_4_window_fft()\n"
       "  peaks = proc.step_6_1_one_max_parabola()")
-      .def(py::init<ROCmGPUContext&, uint32_t, uint32_t, float, float, bool>(),
-           py::arg("ctx"),
+      .def(py::init<ROCmGPUContext&, uint32_t, uint32_t, float, float, bool>(), py::keep_alive<1, 2>(), py::arg("ctx"),
            py::arg("n_ant") = 5,
            py::arg("n_samples") = 8000,
            py::arg("sample_rate") = 12e6f,
