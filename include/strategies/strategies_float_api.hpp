@@ -93,9 +93,9 @@ public:
    * @param mags        Flat float magnitudes [n_ant * nFFT]
    * @param n_ant       Number of beams / antennas
    * @param nFFT        FFT size per beam
-   *   @test { range=[8..4194304], value=1024, pattern=power_of_2 }
+   *   @test { range=[8..4194304], value=1024, pattern=power_of_2, error_values=[-1, 9000000, 3.14] }
    * @param sample_rate Sampling frequency [Hz]
-   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц", error_values=[0.0, 2e9, null] }
    * @return Vector of OneMaxParabolaLite (one per beam)
    *   @test_check result.size() == n_ant
    */
@@ -109,9 +109,9 @@ public:
    * @param mags        Flat float magnitudes [n_ant * nFFT]
    * @param n_ant       Number of beams / antennas
    * @param nFFT        FFT size per beam
-   *   @test { range=[8..4194304], value=1024, pattern=power_of_2 }
+   *   @test { range=[8..4194304], value=1024, pattern=power_of_2, error_values=[-1, 9000000, 3.14] }
    * @param sample_rate Sampling frequency [Hz]
-   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц", error_values=[0.0, 2e9, null] }
    * @return Vector of MinMaxResult (one per beam)
    *   @test_check result.size() == n_ant
    */
@@ -124,19 +124,19 @@ public:
    *
    * @param mags                Flat float magnitudes [beam_count * nFFT]
    * @param beam_count          Number of beams
-   *   @test { range=[1..50000], value=128, unit="лучей/каналов" }
+   *   @test { range=[1..50000], value=128, unit="лучей/каналов", error_values=[-1, 100000, 3.14] }
    * @param nFFT                FFT size per beam
-   *   @test { range=[8..4194304], value=1024, pattern=power_of_2 }
+   *   @test { range=[8..4194304], value=1024, pattern=power_of_2, error_values=[-1, 9000000, 3.14] }
    * @param sample_rate         Sampling frequency [Hz]
-   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц", error_values=[0.0, 2e9, null] }
    * @param dest                Output destination (CPU or GPU)
-   *   @test { size=[100..1300000], value=6000, unit="elements" }
+   *   @test { size=[100..1300000], value=6000, unit="elements", error_values=[-1, 3000000, 3.14] }
    * @param search_start        First bin to search (default 1 to skip DC)
-   *   @test { range=[0..1000000], value=0 }
+   *   @test { range=[0..1000000], value=0, error_values=[-1, 2000000, 3.14] }
    * @param search_end          Last bin (0 = nFFT/2)
-   *   @test { range=[0..1300000], value=8192 }
+   *   @test { range=[0..1300000], value=8192, error_values=[-1, 3000000, 3.14] }
    * @param max_maxima_per_beam Max number of maxima per beam
-   *   @test { range=[1..50000], value=128 }
+   *   @test { range=[1..50000], value=128, error_values=[-1, 100000, 3.14] }
    * @return AllMaximaResult with beams vector
    *   @test_check result.beams.size() == beam_count
    */

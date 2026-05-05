@@ -70,14 +70,14 @@ public:
    * @brief Checkpoint C1: фиксирует входной сигнал d_S перед GEMM.
    *
    * @param d_data GPU-указатель на complex<float>[n_ant × n_samples].
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    * @param n_ant Число антенн (строк в d_S).
    * @param n_samples Число отсчётов на антенну.
-   *   @test { range=[100..1300000], value=6000 }
+   *   @test { range=[100..1300000], value=6000, error_values=[-1, 3000000, 3.14] }
    * @param sample_rate Частота дискретизации, Гц.
-   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц", error_values=[0.0, 2e9, null] }
    * @param gpu_id Идентификатор GPU (для multi-GPU).
-   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   *   @test { range=[0..GetDeviceCount()-1], value=0, error_values=[-1, GetDeviceCount(), 3.14] }
    */
   virtual void save_c1_signal(
       const void* d_data, uint32_t n_ant, uint32_t n_samples,
@@ -87,10 +87,10 @@ public:
    * @brief Checkpoint C1: фиксирует матрицу весов d_W перед GEMM.
    *
    * @param d_weights GPU-указатель на complex<float>[n_ant × n_ant].
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    * @param n_ant Размер матрицы (квадратная n_ant × n_ant).
    * @param gpu_id Идентификатор GPU (для multi-GPU).
-   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   *   @test { range=[0..GetDeviceCount()-1], value=0, error_values=[-1, GetDeviceCount(), 3.14] }
    */
   virtual void save_c1_weights(
       const void* d_weights, uint32_t n_ant, int gpu_id) = 0;
@@ -99,14 +99,14 @@ public:
    * @brief Checkpoint C2: фиксирует результат GEMM (X = W·S) перед FFT.
    *
    * @param d_X GPU-указатель на complex<float>[n_ant × n_samples] — результат GEMM.
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    * @param n_ant Число антенн.
    * @param n_samples Число отсчётов на антенну.
-   *   @test { range=[100..1300000], value=6000 }
+   *   @test { range=[100..1300000], value=6000, error_values=[-1, 3000000, 3.14] }
    * @param sample_rate Частота дискретизации, Гц.
-   *   @test { range=[1.0..1e9], value=10e6, unit="Гц" }
+   *   @test { range=[1.0..1e9], value=10e6, unit="Гц", error_values=[0.0, 2e9, null] }
    * @param gpu_id Идентификатор GPU.
-   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   *   @test { range=[0..GetDeviceCount()-1], value=0, error_values=[-1, GetDeviceCount(), 3.14] }
    */
   virtual void save_c2_data(
       const void* d_X, uint32_t n_ant, uint32_t n_samples,
@@ -119,7 +119,7 @@ public:
    * @param post_stats Указатель на StatisticsResult[n_ant] после GEMM (точка 2.2).
    * @param n_ant Число beam'ов в массивах.
    * @param gpu_id Идентификатор GPU.
-   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   *   @test { range=[0..GetDeviceCount()-1], value=0, error_values=[-1, GetDeviceCount(), 3.14] }
    */
   virtual void save_c2_stats(
       const statistics::StatisticsResult* pre_stats,
@@ -130,12 +130,12 @@ public:
    * @brief Checkpoint C3: фиксирует полный спектр после Window+FFT (до post-FFT шагов).
    *
    * @param d_spectrum GPU-указатель на complex<float>[n_ant × nFFT].
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    * @param n_ant Число beam'ов.
    * @param nFFT Размер FFT (степень двойки).
-   *   @test { range=[8..4194304], value=1024, pattern=power_of_2 }
+   *   @test { range=[8..4194304], value=1024, pattern=power_of_2, error_values=[-1, 9000000, 3.14] }
    * @param gpu_id Идентификатор GPU.
-   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   *   @test { range=[0..GetDeviceCount()-1], value=0, error_values=[-1, GetDeviceCount(), 3.14] }
    */
   virtual void save_c3_spectrum(
       const void* d_spectrum, uint32_t n_ant, uint32_t nFFT, int gpu_id) = 0;
@@ -146,7 +146,7 @@ public:
    * @param results Указатель на MinMaxResult[n_ant] (per-beam global min/max).
    * @param n_ant Число beam'ов в массиве.
    * @param gpu_id Идентификатор GPU.
-   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   *   @test { range=[0..GetDeviceCount()-1], value=0, error_values=[-1, GetDeviceCount(), 3.14] }
    */
   virtual void save_c3_minmax(
       const MinMaxResult* results, uint32_t n_ant, int gpu_id) = 0;
@@ -157,7 +157,7 @@ public:
    * @param results Указатель на OneMaxParabolaLite[n_ant] (per-beam пик с параболической интерполяцией).
    * @param n_ant Число beam'ов в массиве.
    * @param gpu_id Идентификатор GPU.
-   *   @test { range=[0..GetDeviceCount()-1], value=0 }
+   *   @test { range=[0..GetDeviceCount()-1], value=0, error_values=[-1, GetDeviceCount(), 3.14] }
    */
   virtual void save_c4_one_max(
       const OneMaxParabolaLite* results, uint32_t n_ant, int gpu_id) = 0;

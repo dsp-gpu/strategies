@@ -86,9 +86,9 @@ public:
   /**
    * @brief Step 0: Prepare input — store d_S, d_W pointers
    * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU.
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    * @param d_W Матрица весов [n_ant × n_ant] complex<float> на GPU.
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    */
   void step_0_prepare_input(const void* d_S, const void* d_W) {
     d_S_ = d_S;
@@ -237,7 +237,7 @@ public:
    * Call after set_external_weights() to avoid re-uploading W on every frame.
    * Only updates d_S_; d_W_ is set to the internally managed GPU pointer.
    * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU (новый кадр).
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    */
   void step_0_signal_only(const void* d_S) {
     d_S_ = d_S;

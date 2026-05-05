@@ -71,9 +71,9 @@ public:
   /**
    * @brief Запустить полный pipeline антенной обработки.
    * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU.
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    * @param d_W Матрица весов [n_ant × n_ant] complex<float> на GPU.
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    * @return Агрегированный результат: статистики, пики, MinMax, метрики производительности.
    *   @test_check result.success == true (для валидных d_S и d_W)
    */

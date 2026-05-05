@@ -95,7 +95,7 @@ public:
   /**
    * @brief Залить матрицу весов на GPU через IBackend.
    * @param backend Указатель на drv_gpu_lib::IBackend (передаётся как void*).
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr] }
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
    * @param weights Flat [n_ant × n_ant] complex<float> матрица.
    * @return Device-pointer (caller обязан освободить через backend->Free()).
    */
