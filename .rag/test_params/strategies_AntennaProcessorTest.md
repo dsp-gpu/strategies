@@ -393,4 +393,3 @@ _Источник биндинга_: `strategies/python/py_strategies_rocm.hpp`
 | `set_external_weights` | `PyAntennaProcessorTest::set_external_weights` | — |
 | `step_0_signal_only` | `PyAntennaProcessorTest::step_0_signal_only` | — |
 | `process_full_managed_w` | `PyAntennaProcessorTest::process_full_managed_w` | — |
-
