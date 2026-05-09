@@ -160,6 +160,10 @@ used_by: []                              # TODO: AI-fill из других _RAG.
 python_modules:                          # TODO: auto from pybind_bindings
   - TODO
 
+architecture_files:                       # auto: arch_files generator
+  - .rag/arch/C2_container.md
+  - .rag/arch/C3_component.md
+  - .rag/arch/C4_code.md
 tags:                                    # auto-inferred (RAG_CLAUDE_C4)
   - "#layer:strategy"
   - "#repo:strategies"
