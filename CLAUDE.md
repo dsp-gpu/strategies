@@ -41,6 +41,20 @@ strategies/
 - Не делать циклов в DAG — Builder должен проверять и бросать исключение.
 - Не засовывать сюда конкретные ops (FFT, median) — только абстракции и orchestration.
 
+<!-- BEGIN: RAG_CLAUDE_C4 (auto) -->
+## 🏗️ Архитектура (C4 — компактно)
+
+- **C1 System Context:** репо `strategies` (layer=strategy). Полный C4 → `MemoryBank/.architecture/DSP-GPU_Design_C4_Full.md` §`strategies`
+- **C2 Container:** namespace из top key_classes (см. `.rag/_RAG.md`)
+- **C3 Component:** `key_classes` в `.rag/_RAG.md` (top по test_params)
+- **C4 Code:** StrategiesFloatApi · AllMaximaPipelineROCm · ComplexToMagPhaseROCm · GpuContext
+
+## 🏷️ RAG теги
+
+`#layer:strategy` `#repo:strategies` `#namespace:strategies` `#namespace:antenna_fft` `#namespace:fft_processor` `#pattern:Pipeline:AllMaximaPipelineROCm` `#pattern:Pipeline:AntennaProcessorTest` `#pattern:Strategy:DebugStatsStep` `#pattern:Strategy:MinMaxStep` `#pattern:Strategy:OneMaxStep` `#pattern:Strategy:AllMaximaStep` `#pattern:Strategy:GemmStep` `#pattern:Strategy:WindowFftStep`
+
+<!-- END: RAG_CLAUDE_C4 (auto) -->
+
 ## 🔗 Правила (path-scoped автоматически)
 
 - `05-architecture-ref03.md` — Strategy + Builder

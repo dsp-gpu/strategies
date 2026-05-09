@@ -160,7 +160,20 @@ used_by: []                              # TODO: AI-fill из других _RAG.
 python_modules:                          # TODO: auto from pybind_bindings
   - TODO
 
-tags: []                                 # TODO: AI-fill
+tags:                                    # auto-inferred (RAG_CLAUDE_C4)
+  - "#layer:strategy"
+  - "#repo:strategies"
+  - "#namespace:strategies"
+  - "#namespace:antenna_fft"
+  - "#namespace:fft_processor"
+  - "#pattern:Pipeline:AllMaximaPipelineROCm"
+  - "#pattern:Pipeline:AntennaProcessorTest"
+  - "#pattern:Strategy:DebugStatsStep"
+  - "#pattern:Strategy:MinMaxStep"
+  - "#pattern:Strategy:OneMaxStep"
+  - "#pattern:Strategy:AllMaximaStep"
+  - "#pattern:Strategy:GemmStep"
+  - "#pattern:Strategy:WindowFftStep"
 
 notes: []                                # TODO: AI-fill из ai_summary
 
