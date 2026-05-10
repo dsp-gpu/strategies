@@ -170,14 +170,17 @@ tags:                                    # auto-inferred (RAG_CLAUDE_C4)
   - "#namespace:strategies"
   - "#namespace:antenna_fft"
   - "#namespace:fft_processor"
-  - "#pattern:Pipeline:AllMaximaPipelineROCm"
-  - "#pattern:Pipeline:AntennaProcessorTest"
   - "#pattern:Strategy:DebugStatsStep"
   - "#pattern:Strategy:MinMaxStep"
   - "#pattern:Strategy:OneMaxStep"
   - "#pattern:Strategy:AllMaximaStep"
   - "#pattern:Strategy:GemmStep"
   - "#pattern:Strategy:WindowFftStep"
+  - "#pattern:Pipeline:Pipeline"
+  - "#pattern:Pipeline:PipelineContext"
+  - "#pattern:Strategy:IPipelineStep"
+  - "#pattern:Strategy:PipelineStepBase"
+  - "#pattern:Builder:PipelineBuilder"
 
 notes: []                                # TODO: AI-fill из ai_summary
 
