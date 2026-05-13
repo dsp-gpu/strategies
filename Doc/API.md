@@ -1,4 +1,4 @@
-# strategies — API Reference
+﻿# strategies — API Reference
 
 > Полный справочник публичных классов и методов модуля `strategies/`
 
@@ -28,7 +28,7 @@
 Абстрактный базовый класс. Точка входа pipeline.
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 class AntennaProcessor {
 public:
@@ -81,7 +81,7 @@ public:
 Конкретная ROCm-реализация. 4 HIP-потока, hipBLAS, hipFFT, hiprtc.
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 class AntennaProcessor_v1 : public AntennaProcessor {
 public:
@@ -140,7 +140,7 @@ protected:
 Наследник `AntennaProcessor_v1`, открывает step-by-step API для валидации каждого шага.
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 class AntennaProcessorTest : public AntennaProcessor_v1 {
 public:
@@ -217,7 +217,7 @@ public:
 Статический класс. Генерация и загрузка матрицы весов.
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 struct WeightParams {
   uint32_t n_ant    = 5;       ///< Число антенн
@@ -264,7 +264,7 @@ public:
 **Файл**: `strategies/include/config/antenna_processor_config.hpp`
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 /** Конфигурация checkpoint сохранений */
 struct CheckpointSaveConfig {
@@ -302,7 +302,7 @@ struct AntennaProcessorConfig {
 **Файл**: `strategies/include/config/post_fft_scenario_mode.hpp`
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 enum class PostFftScenarioMode : uint8_t {
   ALL_REQUIRED     = 0,  ///< Step2.1 + Step2.2 + Step2.3 (production)
@@ -317,7 +317,7 @@ enum class PostFftScenarioMode : uint8_t {
 **Файл**: `strategies/include/config/statistics_set.hpp`
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 using StatisticsSet = uint8_t;
 
@@ -347,7 +347,7 @@ namespace StatPreset {
 **Файл**: `strategies/include/result_types.hpp`
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 /** Step2.1: главный пик + параболическое уточнение (без фазы) */
 struct OneMaxParabolaLite {
@@ -388,17 +388,17 @@ struct PerfMetrics {
 /** Агрегированный результат process() */
 struct AntennaResult {
   // Статистика на 3 debug точках (size = n_ant)
-  std::vector<statistics::StatisticsResult> pre_input_stats;
-  std::vector<statistics::StatisticsResult> post_gemm_stats;
-  std::vector<statistics::StatisticsResult> post_fft_stats;
+  std::vector<dsp::stats::StatisticsResult> pre_input_stats;
+  std::vector<dsp::stats::StatisticsResult> post_gemm_stats;
+  std::vector<dsp::stats::StatisticsResult> post_fft_stats;
 
-  std::vector<statistics::MedianResult> pre_input_medians;
-  std::vector<statistics::MedianResult> post_gemm_medians;
-  std::vector<statistics::MedianResult> post_fft_medians;
+  std::vector<dsp::stats::MedianResult> pre_input_medians;
+  std::vector<dsp::stats::MedianResult> post_gemm_medians;
+  std::vector<dsp::stats::MedianResult> post_fft_medians;
 
   // Post-FFT результаты (size = n_ant)
   std::vector<OneMaxParabolaLite>               one_max;     // Step2.1
-  std::vector<antenna_fft::AllMaximaBeamResult> all_maxima;  // Step2.2
+  std::vector<dsp::spectrum::AllMaximaBeamResult> all_maxima;  // Step2.2
   std::vector<MinMaxResult>                     minmax;      // Step2.3
 
   PostFftScenarioMode scenario_mode = PostFftScenarioMode::ALL_REQUIRED;
@@ -417,7 +417,7 @@ struct AntennaResult {
 **Файл**: `strategies/include/interfaces/i_checkpoint_save.hpp`
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 class ICheckpointSave {
 public:
@@ -429,8 +429,8 @@ public:
       uint32_t n_ant, int gpu_id) = 0;
   virtual void save_c2_data(const void* d_X, uint32_t n_ant,
       uint32_t n_samples, float sample_rate, int gpu_id) = 0;
-  virtual void save_c2_stats(const std::vector<statistics::StatisticsResult>& pre,
-      const std::vector<statistics::StatisticsResult>& post,
+  virtual void save_c2_stats(const std::vector<dsp::stats::StatisticsResult>& pre,
+      const std::vector<dsp::stats::StatisticsResult>& post,
       uint32_t n_ant, int gpu_id) = 0;
   virtual void save_c3_spectrum(const void* d_spectrum, uint32_t n_ant,
       uint32_t nFFT, int gpu_id) = 0;
@@ -448,7 +448,7 @@ public:
 **Файл**: `strategies/include/checkpoint/null_checkpoint_save.hpp`
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 // Null Object — все методы пусты (inline), нулевой overhead
 class NullCheckpointSave : public ICheckpointSave {
@@ -470,7 +470,7 @@ public:
 **Файл**: `strategies/include/interfaces/i_post_fft_scenario.hpp`
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 class IPostFftScenario {
 public:
@@ -498,36 +498,36 @@ public:
 ### Production — полный pipeline
 
 ```cpp
-#include <strategies/antenna_processor_v1.hpp>
+#include <dsp/strategies/antenna_processor_v1.hpp>
 #include "weight_generator.hpp"
 
 // ── 1. Конфиг ──────────────────────────────────────────────────────────
-strategies::AntennaProcessorConfig cfg;
+dsp::strategies::AntennaProcessorConfig cfg;
 cfg.n_ant            = 256;
 cfg.n_samples        = 1'200'000;
 cfg.sample_rate      = 12.0e6f;
-cfg.scenario_mode    = strategies::PostFftScenarioMode::ALL_REQUIRED;
-cfg.pre_input_stats  = strategies::StatPreset::P61_ALL;
-cfg.post_gemm_stats  = strategies::StatPreset::P61_ALL;
-cfg.post_fft_stats   = strategies::StatPreset::P61_ALL;
+cfg.scenario_mode    = dsp::strategies::PostFftScenarioMode::ALL_REQUIRED;
+cfg.pre_input_stats  = dsp::strategies::StatPreset::P61_ALL;
+cfg.post_gemm_stats  = dsp::strategies::StatPreset::P61_ALL;
+cfg.post_fft_stats   = dsp::strategies::StatPreset::P61_ALL;
 // cfg.save_cfg = nullptr → NullCheckpointSave (zero overhead)
 
 // ── 2. Матрица весов ────────────────────────────────────────────────────
-strategies::WeightParams wp;
+dsp::strategies::WeightParams wp;
 wp.n_ant    = cfg.n_ant;
 wp.f0       = 2.0e6;
 wp.tau_base = 0.0;
 wp.tau_step = 100e-6;
 
-auto W_cpu = strategies::WeightGenerator::generate_delay_and_sum(wp);
-void* d_W  = strategies::WeightGenerator::upload_to_gpu(backend, W_cpu);
+auto W_cpu = dsp::strategies::WeightGenerator::generate_delay_and_sum(wp);
+void* d_W  = dsp::strategies::WeightGenerator::upload_to_gpu(backend, W_cpu);
 // ⚠️ Помнить: backend->Free(d_W) после использования!
 
 // ── 3. Создать процессор ────────────────────────────────────────────────
-strategies::AntennaProcessor_v1 proc(backend, cfg);
+dsp::strategies::AntennaProcessor_v1 proc(backend, cfg);
 
 // ── 4. Запуск (d_S уже в VRAM) ─────────────────────────────────────────
-strategies::AntennaResult r = proc.process(d_S, d_W);
+dsp::strategies::AntennaResult r = proc.process(d_S, d_W);
 
 // ── 5. Результаты ───────────────────────────────────────────────────────
 for (uint32_t b = 0; b < cfg.n_ant; ++b) {
@@ -545,14 +545,14 @@ backend->Free(d_W);  // Caller owns d_W!
 ### Debug — пошаговый тест
 
 ```cpp
-#include <strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
 
-strategies::AntennaProcessorConfig cfg;
+dsp::strategies::AntennaProcessorConfig cfg;
 cfg.n_ant       = 5;
 cfg.n_samples   = 8000;
 cfg.debug_mode  = true;  // включить D2H на debug точках
 
-strategies::AntennaProcessorTest proc(backend, cfg);
+dsp::strategies::AntennaProcessorTest proc(backend, cfg);
 
 proc.step_0_prepare_input(d_S, d_W);
 proc.step_1_debug_input();      // Выводит статистику d_S

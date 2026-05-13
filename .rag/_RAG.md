@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 repo: strategies
 version: 0.1.0
@@ -17,96 +17,96 @@ modules:
     - strategies
 
 key_classes:                            # auto: top по test_params
-  - fqn: strategies::StrategiesFloatApi
+  - fqn: dsp::strategies::StrategiesFloatApi
     brief: "Standalone post-FFT computations from CPU float magnitudes"
     maturity: alpha
     methods: 8
     test_params_rows: 16
-    test_params: test_params/strategies_StrategiesFloatApi.md
-  - fqn: antenna_fft::AllMaximaPipelineROCm
+    test_params: test_params/dsp_strategies_StrategiesFloatApi.md
+  - fqn: dsp::spectrum::AllMaximaPipelineROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 8
     test_params_rows: 9
-    test_params: test_params/antenna_fft_AllMaximaPipelineROCm.md
-  - fqn: fft_processor::ComplexToMagPhaseROCm
+    test_params: test_params/dsp_spectrum_AllMaximaPipelineROCm.md
+  - fqn: dsp::spectrum::ComplexToMagPhaseROCm
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 18
     test_params_rows: 6
-    test_params: test_params/fft_processor_ComplexToMagPhaseROCm.md
+    test_params: test_params/dsp_spectrum_ComplexToMagPhaseROCm.md
   - fqn: drv_gpu_lib::GpuContext
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 14
     test_params_rows: 4
     test_params: test_params/drv_gpu_lib_GpuContext.md
-  - fqn: strategies::AntennaProcessorTest
+  - fqn: dsp::strategies::AntennaProcessorTest
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 14
     test_params_rows: 3
-    test_params: test_params/strategies_AntennaProcessorTest.md
-  - fqn: strategies::DebugStatsStep
+    test_params: test_params/dsp_strategies_AntennaProcessorTest.md
+  - fqn: dsp::strategies::DebugStatsStep
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 3
     test_params_rows: 2
-    test_params: test_params/strategies_DebugStatsStep.md
-  - fqn: strategies::MinMaxStep
+    test_params: test_params/dsp_strategies_DebugStatsStep.md
+  - fqn: dsp::strategies::MinMaxStep
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 3
     test_params_rows: 2
-    test_params: test_params/strategies_MinMaxStep.md
-  - fqn: strategies::OneMaxStep
+    test_params: test_params/dsp_strategies_MinMaxStep.md
+  - fqn: dsp::strategies::OneMaxStep
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 3
     test_params_rows: 2
-    test_params: test_params/strategies_OneMaxStep.md
-  - fqn: strategies::AllMaximaStep
+    test_params: test_params/dsp_strategies_OneMaxStep.md
+  - fqn: dsp::strategies::AllMaximaStep
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 2
     test_params_rows: 2
-    test_params: test_params/strategies_AllMaximaStep.md
-  - fqn: strategies::GemmStep
-    brief: "TODO: AI-fill"
-    maturity: alpha
-    methods: 2
-    test_params_rows: 1
-    test_params: test_params/strategies_GemmStep.md
-  - fqn: strategies::WindowFftStep
+    test_params: test_params/dsp_strategies_AllMaximaStep.md
+  - fqn: dsp::strategies::GemmStep
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 2
     test_params_rows: 1
-    test_params: test_params/strategies_WindowFftStep.md
-  - fqn: strategies::Pipeline
+    test_params: test_params/dsp_strategies_GemmStep.md
+  - fqn: dsp::strategies::WindowFftStep
+    brief: "TODO: AI-fill"
+    maturity: alpha
+    methods: 2
+    test_params_rows: 1
+    test_params: test_params/dsp_strategies_WindowFftStep.md
+  - fqn: dsp::strategies::Pipeline
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 1
     test_params_rows: 1
-    test_params: test_params/strategies_Pipeline.md
-  - fqn: strategies::WeightGenerator
+    test_params: test_params/dsp_strategies_Pipeline.md
+  - fqn: dsp::strategies::WeightGenerator
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 1
     test_params_rows: 1
-    test_params: test_params/strategies_WeightGenerator.md
-  - fqn: strategies::AntennaProcessor_v1
+    test_params: test_params/dsp_strategies_WeightGenerator.md
+  - fqn: dsp::strategies::AntennaProcessor_v1
     brief: "@ingroup grp_strategies"
     maturity: alpha
     methods: 38
     test_params_rows: 0
-    test_params: test_params/strategies_AntennaProcessor_v1.md
-  - fqn: statistics::StatisticsProcessor
+    test_params: test_params/dsp_strategies_AntennaProcessor_v1.md
+  - fqn: dsp::stats::StatisticsProcessor
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 32
     test_params_rows: 0
-    test_params: test_params/statistics_StatisticsProcessor.md
+    test_params: test_params/dsp_stats_StatisticsProcessor.md
   - fqn: PyAntennaProcessorTest
     brief: "TODO: AI-fill"
     maturity: alpha
@@ -119,12 +119,12 @@ key_classes:                            # auto: top по test_params
     methods: 10
     test_params_rows: 0
     test_params: test_params/test_strategies_StrategyTestBase.md
-  - fqn: strategies::NullCheckpointSave
+  - fqn: dsp::strategies::NullCheckpointSave
     brief: "TODO: AI-fill"
     maturity: alpha
     methods: 7
     test_params_rows: 0
-    test_params: test_params/strategies_NullCheckpointSave.md
+    test_params: test_params/dsp_strategies_NullCheckpointSave.md
   - fqn: test_strategies::TimingPerStepTest
     brief: "Быстрый замер времени каждого шага AntennaProcessor"
     maturity: alpha
@@ -167,7 +167,7 @@ architecture_files:                       # auto: arch_files generator
 tags:                                    # auto-inferred (RAG_CLAUDE_C4)
   - "#layer:strategy"
   - "#repo:strategies"
-  - "#namespace:strategies"
+  - "#namespace:dsp_strategies"
   - "#namespace:antenna_fft"
   - "#namespace:fft_processor"
   - "#pattern:Strategy:DebugStatsStep"

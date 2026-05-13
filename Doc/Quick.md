@@ -1,4 +1,4 @@
-# strategies — Краткий справочник
+﻿# strategies — Краткий справочник
 
 > GPU-обработка антенной матрицы: GEMM + Hamming + FFT + анализ спектра (ROCm / AMD GPU)
 
@@ -124,25 +124,25 @@ minmax[0]['dynamic_range_dB']   # динамический диапазон лу
 ## Быстрый старт — C++
 
 ```cpp
-#include <strategies/antenna_processor_v1.hpp>
+#include <dsp/strategies/antenna_processor_v1.hpp>
 #include "weight_generator.hpp"
 
 // 1. Конфиг
-strategies::AntennaProcessorConfig cfg;
+dsp::strategies::AntennaProcessorConfig cfg;
 cfg.n_ant          = 5;
 cfg.n_samples      = 8000;
 cfg.sample_rate    = 12.0e6f;
-cfg.scenario_mode  = strategies::PostFftScenarioMode::ALL_REQUIRED;
+cfg.scenario_mode  = dsp::strategies::PostFftScenarioMode::ALL_REQUIRED;
 
 // 2. Матрица весов
-strategies::WeightParams wp;
+dsp::strategies::WeightParams wp;
 wp.n_ant = 5;  wp.f0 = 2e6;  wp.tau_step = 100e-6;
-auto W_cpu = strategies::WeightGenerator::generate_delay_and_sum(wp);
-void* d_W = strategies::WeightGenerator::upload_to_gpu(backend, W_cpu);
+auto W_cpu = dsp::strategies::WeightGenerator::generate_delay_and_sum(wp);
+void* d_W = dsp::strategies::WeightGenerator::upload_to_gpu(backend, W_cpu);
 
 // 3. Запуск
-strategies::AntennaProcessor_v1 proc(backend, cfg);
-strategies::AntennaResult r = proc.process(d_S, d_W);
+dsp::strategies::AntennaProcessor_v1 proc(backend, cfg);
+dsp::strategies::AntennaResult r = proc.process(d_S, d_W);
 
 // 4. Результаты
 float f_peak = r.one_max[0].refined_freq_hz;   // Гц

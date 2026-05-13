@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: strategies
-class_fqn: antenna_fft::AllMaximaPipelineROCm
+class_fqn: dsp::spectrum::AllMaximaPipelineROCm
 file: E:/DSP-GPU/strategies/include/strategies/pipeline_context.hpp
 line: 31
 brief: "Обрабатывает массивы данных с использованием FFT на GPU ROCm для поиска максимумов в спектре."
@@ -15,7 +15,7 @@ synonyms_en: ['ROCmPipeline', 'FFTMaximaFinder', 'AntennaSignalProcessor', 'GPUM
 tags: ['GPU', 'ROCm', 'FFT', 'SignalProcessing', 'Radar', 'Pipeline']
 ---
 
-# `antenna_fft::AllMaximaPipelineROCm` — карточка класса
+# `dsp::spectrum::AllMaximaPipelineROCm` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo strategies --class AllMaximaPipelineROCm`.
 > Не править руками — правки потеряются при следующем refresh.

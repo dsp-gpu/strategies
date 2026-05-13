@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: strategies
-class_fqn: strategies::AntennaProcessor_v1
+class_fqn: dsp::strategies::AntennaProcessor_v1
 file: E:/DSP-GPU/strategies/include/strategies/antenna_processor_v1.hpp
 line: 50
 brief: "Обрабатывает сигналы с использованием GPU-потоков и событий для параллельной обработки данных."
@@ -15,7 +15,7 @@ synonyms_en: ['Antenna Processing', 'GPU Signal Processing', 'Strategy Pattern',
 tags: ['GPU', 'HIP', 'Parallel Processing', 'Antennas', 'Strategies']
 ---
 
-# `strategies::AntennaProcessor_v1` — карточка класса
+# `dsp::strategies::AntennaProcessor_v1` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo strategies --class AntennaProcessor_v1`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,8 +35,8 @@ tags: ['GPU', 'HIP', 'Parallel Processing', 'Antennas', 'Strategies']
 
 **Пример**:
 ```cpp
-#include "strategies/antenna_processor_v1.hpp"
-using namespace strategies;
+#include "dsp/strategies/antenna_processor_v1.hpp"
+using namespace dsp::strategies;
 
 int main() {
     AntennaProcessor_v1 processor;

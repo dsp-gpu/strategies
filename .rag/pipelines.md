@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 kind: pipelines
 repo: strategies
@@ -301,7 +301,7 @@ updated_at: 2026-05-06
 ```
 
 **Используемые классы**:
-- `lch_farrow::LchFarrowROCm`
+- `dsp::spectrum::LchFarrowROCm`
 - `CaponProcessor`
 - `AntennaProcessorROCm`
 - `AntennaProcessorTest`

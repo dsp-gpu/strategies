@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: strategies
-class_fqn: strategies::AntennaProcessorTest
+class_fqn: dsp::strategies::AntennaProcessorTest
 file: E:/DSP-GPU/strategies/include/strategies/antenna_processor_test.hpp
 line: 24
 brief: "Предоставляет пошаговый интерфейс для тестирования обработки сигналов на GPU с синхронизацией ROCm."
@@ -15,7 +15,7 @@ synonyms_en: ['test processor', 'step-by-step processing', 'GPU testing', 'ROCm 
 tags: ['GPU', 'тестирование', 'обработка сигналов', 'ROCm', 'пошаговый API']
 ---
 
-# `strategies::AntennaProcessorTest` — карточка класса
+# `dsp::strategies::AntennaProcessorTest` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo strategies --class AntennaProcessorTest`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,8 +35,8 @@ tags: ['GPU', 'тестирование', 'обработка сигналов',
 
 **Пример**:
 ```cpp
-#include "strategies/antenna_processor_test.hpp"
-using namespace strategies;
+#include "dsp/strategies/antenna_processor_test.hpp"
+using namespace dsp::strategies;
 
 int main() {
   auto backend = ...;

@@ -1,4 +1,4 @@
-# strategies — Полная документация
+﻿# strategies — Полная документация
 
 > GPU-pipeline обработки антенной матрицы: GEMM + Hamming + FFT + анализ спектра
 
@@ -173,17 +173,17 @@ sequenceDiagram
 ### Иерархия
 
 ```
-strategies::AntennaProcessor          ← abstract base (antenna_processor.hpp)
-└── strategies::AntennaProcessor_v1   ← ROCm impl (antenna_processor_v1.hpp)
-    └── strategies::AntennaProcessorTest  ← step-by-step (antenna_processor_test.hpp)
+dsp::strategies::AntennaProcessor          ← abstract base (antenna_processor.hpp)
+└── dsp::strategies::AntennaProcessor_v1   ← ROCm impl (antenna_processor_v1.hpp)
+    └── dsp::strategies::AntennaProcessorTest  ← step-by-step (antenna_processor_test.hpp)
 
-strategies::IPostFftScenario          ← interface (i_post_fft_scenario.hpp)
+dsp::strategies::IPostFftScenario          ← interface (i_post_fft_scenario.hpp)
   (реализации встроены в AntennaProcessor_v1, не вынесены в отдельные файлы)
 
-strategies::ICheckpointSave           ← interface (i_checkpoint_save.hpp)
-└── strategies::NullCheckpointSave    ← no-op (null_checkpoint_save.hpp)
+dsp::strategies::ICheckpointSave           ← interface (i_checkpoint_save.hpp)
+└── dsp::strategies::NullCheckpointSave    ← no-op (null_checkpoint_save.hpp)
 
-strategies::WeightGenerator           ← static class (weight_generator.hpp)
+dsp::strategies::WeightGenerator           ← static class (weight_generator.hpp)
 ```
 
 ### GoF паттерны
@@ -323,7 +323,7 @@ __global__ void one_max_no_phase(
 #### AntennaProcessor (abstract)
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 class AntennaProcessor {
 public:
@@ -350,7 +350,7 @@ public:
 #### AntennaProcessor_v1 (concrete)
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 class AntennaProcessor_v1 : public AntennaProcessor {
 public:
@@ -377,7 +377,7 @@ protected:
 #### AntennaProcessorTest (test-only)
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 class AntennaProcessorTest : public AntennaProcessor_v1 {
 public:
@@ -403,7 +403,7 @@ public:
 #### WeightGenerator
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 struct WeightParams {
   uint32_t n_ant    = 5;
@@ -429,7 +429,7 @@ public:
 #### Структуры результатов
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 struct OneMaxParabolaLite {
   uint32_t beam_id;
@@ -454,15 +454,15 @@ struct PerfMetrics {
 };
 
 struct AntennaResult {
-  std::vector<statistics::StatisticsResult> pre_input_stats;
-  std::vector<statistics::StatisticsResult> post_gemm_stats;
-  std::vector<statistics::StatisticsResult> post_fft_stats;
-  std::vector<statistics::MedianResult>     pre_input_medians;
-  std::vector<statistics::MedianResult>     post_gemm_medians;
-  std::vector<statistics::MedianResult>     post_fft_medians;
+  std::vector<dsp::stats::StatisticsResult> pre_input_stats;
+  std::vector<dsp::stats::StatisticsResult> post_gemm_stats;
+  std::vector<dsp::stats::StatisticsResult> post_fft_stats;
+  std::vector<dsp::stats::MedianResult>     pre_input_medians;
+  std::vector<dsp::stats::MedianResult>     post_gemm_medians;
+  std::vector<dsp::stats::MedianResult>     post_fft_medians;
 
   std::vector<OneMaxParabolaLite>               one_max;     // Step2.1
-  std::vector<antenna_fft::AllMaximaBeamResult> all_maxima;  // Step2.2
+  std::vector<dsp::spectrum::AllMaximaBeamResult> all_maxima;  // Step2.2
   std::vector<MinMaxResult>                     minmax;      // Step2.3
 
   PostFftScenarioMode scenario_mode;
@@ -735,7 +735,7 @@ profiler.ExportJSON("Results/Profiler/strategies_YYYY-MM-DD.json");
 ## 11. Конфигурация
 
 ```cpp
-namespace strategies {
+namespace dsp::strategies {
 
 struct AntennaProcessorConfig {
   // Размеры
@@ -795,7 +795,7 @@ cfg.save_cfg = nullptr;  // → NullCheckpointSave автоматически
 
 **Debug** (включить нужные точки):
 ```cpp
-strategies::CheckpointSaveConfig save_cfg;
+dsp::strategies::CheckpointSaveConfig save_cfg;
 save_cfg.c2_stats = true;  // статистика PRE/POST GEMM
 save_cfg.c4_result = true; // пики
 cfg.save_cfg = &save_cfg;

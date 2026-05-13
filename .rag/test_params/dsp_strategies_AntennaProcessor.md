@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: strategies
-class_fqn: strategies::AntennaProcessor
+class_fqn: dsp::strategies::AntennaProcessor
 file: E:/DSP-GPU/strategies/include/strategies/antenna_processor.hpp
 line: 18
 brief: "Определяет интерфейс для обработки сигналов с использованием GPU. Обеспечивает абстракцию для работы с антеннами в пайплайне."
@@ -15,7 +15,7 @@ synonyms_en: ['AntennaProcessor', 'AntennaProcessor_v1', 'SignalProcessor', 'Ant
 tags: ['GPU', 'Signal Processing', 'Strategy Pattern', 'Pipeline']
 ---
 
-# `strategies::AntennaProcessor` — карточка класса
+# `dsp::strategies::AntennaProcessor` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo strategies --class AntennaProcessor`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,9 +35,9 @@ tags: ['GPU', 'Signal Processing', 'Strategy Pattern', 'Pipeline']
 
 **Пример**:
 ```cpp
-#include "strategies/antenna_processor.hpp"
+#include "dsp/strategies/antenna_processor.hpp"
 
-using namespace strategies;
+using namespace dsp::strategies;
 
 int main() {
     auto processor = std::make_unique<AntennaProcessor_v1>();

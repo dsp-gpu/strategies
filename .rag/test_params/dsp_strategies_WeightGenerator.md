@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: strategies
-class_fqn: strategies::WeightGenerator
+class_fqn: dsp::strategies::WeightGenerator
 file: E:/DSP-GPU/strategies/include/strategies/weight_generator.hpp
 line: 29
 brief: "Генерирует и загружает на GPU матрицу весов для алгоритма delay-and-sum."
@@ -15,7 +15,7 @@ synonyms_en: ['WeightGenerator', 'WeightMatrix', 'DelayAndSumMatrix', 'Beamformi
 tags: ['GPU', 'радиолокация', 'delay-and-sum', 'ROCm', 'HIP']
 ---
 
-# `strategies::WeightGenerator` — карточка класса
+# `dsp::strategies::WeightGenerator` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo strategies --class WeightGenerator`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,15 +35,15 @@ tags: ['GPU', 'радиолокация', 'delay-and-sum', 'ROCm', 'HIP']
 
 **Пример**:
 ```cpp
-#include <strategies/antenna_processor_v1.hpp>
+#include <dsp/strategies/antenna_processor_v1.hpp>
 #include "weight_generator.hpp"
 
-strategies::AntennaProcessorConfig cfg;
+dsp::strategies::AntennaProcessorConfig cfg;
 cfg.n_ant = 5;
 
-strategies::WeightParams wp;
+dsp::strategies::WeightParams wp;
 wp.n_ant = 5; wp.f0 = 2e6;
-auto W_cpu = strategies::WeightGenerator::generate_delay_and_sum(wp);
+auto W_cpu = dsp::strategies::WeightGenerator::generate_delay_and_sum(wp);
 void* d_W = strategies,WeightGenerator::upload_to_gpu(backend, W_cpu);
 ```
 
@@ -53,9 +53,9 @@ void* d_W = strategies,WeightGenerator::upload_to_gpu(backend, W_cpu);
 
 - `strategies__gpu__s_8_001__v1` (s_8): ## 8. Файловая структура  ``` strategies/ ├── CMakeLists.txt ├── include/ │   ├── antenna_processor.hpp          # AntennaProcessor (abstract) │   ├── antenna_processor_v1.hpp       # AntennaProcessor…
 - `strategies__gpu__api_003__v1` (api):   // Пошаговый API (порядок важен!)   void step_0_prepare_input(const void* d_S, const void* d_W);   void step_1_debug_input();       // D2H stats on d_S → CPU   void step_2_gemm();              // X …
-- `strategies__api__pipeline_data_flow_002__v1` (pipeline_data_flow): ### Production — полный pipeline  ```cpp #include <strategies/antenna_processor_v1.hpp> #include "weight_generator.hpp"  // ── 1. Конфиг ────────────────────────────────────────────────────────── stra…
+- `strategies__api__pipeline_data_flow_002__v1` (pipeline_data_flow): ### Production — полный pipeline  ```cpp #include <dsp/strategies/antenna_processor_v1.hpp> #include "weight_generator.hpp"  // ── 1. Конфиг ────────────────────────────────────────────────────────── stra…
 - `strategies__api__s_4_weightgenerator__v1` (s_4_weightgenerator): ## 4. WeightGenerator  **Файл**: `strategies/include/weight_generator.hpp` **Реализация**: `strategies/src/weight_generator.cpp`  Статический класс. Генерация и загрузка матрицы весов.  ```cpp namespa…
-- `strategies__quick__c__v1` (c): ## Быстрый старт — C++  ```cpp #include <strategies/antenna_processor_v1.hpp> #include "weight_generator.hpp"  // 1. Конфиг strategies::AntennaProcessorConfig cfg; cfg.n_ant          = 5; cfg.n_sample…
+- `strategies__quick__c__v1` (c): ## Быстрый старт — C++  ```cpp #include <dsp/strategies/antenna_processor_v1.hpp> #include "weight_generator.hpp"  // 1. Конфиг dsp::strategies::AntennaProcessorConfig cfg; cfg.n_ant          = 5; cfg.n_sample…
 
 ## Public-методы (2)
 

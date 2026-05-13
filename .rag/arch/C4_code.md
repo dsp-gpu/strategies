@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 repo: strategies
 arch_level: c4
@@ -33,13 +33,13 @@ description: "C4 Code — реальные классы с паттернами 
 
 ## Все key_classes (FQN список)
 
-- `statistics::StatisticsProcessor` (32 методов)
-- `strategies::StrategiesFloatApi` (8 методов)
-- `strategies::NullCheckpointSave` (7 методов)
-- `strategies::AntennaProcessorTest` (14 методов)
-- `fft_processor::ComplexToMagPhaseROCm` (18 методов)
-- `antenna_fft::AllMaximaPipelineROCm` (8 методов)
+- `dsp::stats::StatisticsProcessor` (32 методов)
+- `dsp::strategies::StrategiesFloatApi` (8 методов)
+- `dsp::strategies::NullCheckpointSave` (7 методов)
+- `dsp::strategies::AntennaProcessorTest` (14 методов)
+- `dsp::spectrum::ComplexToMagPhaseROCm` (18 методов)
+- `dsp::spectrum::AllMaximaPipelineROCm` (8 методов)
 - `test_strategies::BaseStrategyTest` (3 методов)
 - `drv_gpu_lib::GpuContext` (14 методов)
-- `strategies::AntennaProcessor_v1` (38 методов)
-- `strategies::OneMaxStep` (3 методов)
+- `dsp::strategies::AntennaProcessor_v1` (38 методов)
+- `dsp::strategies::OneMaxStep` (3 методов)

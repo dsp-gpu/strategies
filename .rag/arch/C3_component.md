@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 repo: strategies
 arch_level: c3
@@ -7,7 +7,7 @@ tags:
   - "#repo:strategies"
   - "#layer:strategy"
   - "#namespace:statistics"
-  - "#namespace:strategies"
+  - "#namespace:dsp_strategies"
   - "#namespace:fft_processor"
 description: "C3 Component — key classes и интерфейсы репо strategies."
 ---
@@ -16,37 +16,37 @@ description: "C3 Component — key classes и интерфейсы репо stra
 
 ## Key classes (top-10 по test_params)
 
-### `statistics::StatisticsProcessor`
+### `dsp::stats::StatisticsProcessor`
 
 - **Namespace:** `statistics`
 - **Методы:** 32, **test_params rows:** 36
 - **Brief:** *(описание не задано)*
 
-### `strategies::StrategiesFloatApi`
+### `dsp::strategies::StrategiesFloatApi`
 
 - **Namespace:** `strategies`
 - **Методы:** 8, **test_params rows:** 19
 - **Brief:** post-FFT computations from CPU float magnitudes Compiles strategies kernels once in the constructor via GpuContext (disk-cached HSAC
 
-### `strategies::NullCheckpointSave`
+### `dsp::strategies::NullCheckpointSave`
 
 - **Namespace:** `strategies`
 - **Методы:** 7, **test_params rows:** 16
 - **Brief:** *(описание не задано)*
 
-### `strategies::AntennaProcessorTest`
+### `dsp::strategies::AntennaProcessorTest`
 
 - **Namespace:** `strategies`
 - **Методы:** 14, **test_params rows:** 14
 - **Brief:** *(описание не задано)*
 
-### `fft_processor::ComplexToMagPhaseROCm`
+### `dsp::spectrum::ComplexToMagPhaseROCm`
 
 - **Namespace:** `fft_processor`
 - **Методы:** 18, **test_params rows:** 12
 - **Brief:** *(описание не задано)*
 
-### `antenna_fft::AllMaximaPipelineROCm`
+### `dsp::spectrum::AllMaximaPipelineROCm`
 
 - **Namespace:** `antenna_fft`
 - **Методы:** 8, **test_params rows:** 10
@@ -64,13 +64,13 @@ description: "C3 Component — key classes и интерфейсы репо stra
 - **Методы:** 14, **test_params rows:** 7
 - **Brief:** *(описание не задано)*
 
-### `strategies::AntennaProcessor_v1`
+### `dsp::strategies::AntennaProcessor_v1`
 
 - **Namespace:** `strategies`
 - **Методы:** 38, **test_params rows:** 4
 - **Brief:** *(описание не задано)*
 
-### `strategies::OneMaxStep`
+### `dsp::strategies::OneMaxStep`
 
 - **Namespace:** `strategies`
 - **Методы:** 3, **test_params rows:** 4
@@ -79,8 +79,8 @@ description: "C3 Component — key classes и интерфейсы репо stra
 ## Интерфейсы (наследуемые)
 
 - `drv_gpu_lib::IBackend` (потенциальных реализаций: 6)
-- `strategies::ICheckpointSave` (потенциальных реализаций: 2)
-- `strategies::IPipelineStep` (потенциальных реализаций: 2)
-- `strategies::IPostFftScenario` (потенциальных реализаций: 0)
+- `dsp::strategies::ICheckpointSave` (потенциальных реализаций: 2)
+- `dsp::strategies::IPipelineStep` (потенциальных реализаций: 2)
+- `dsp::strategies::IPostFftScenario` (потенциальных реализаций: 0)
 - `test_strategies::ISignalStrategy` (потенциальных реализаций: 5)
 

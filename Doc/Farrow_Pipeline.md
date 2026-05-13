@@ -1,4 +1,4 @@
-# 📝 Farrow Pipeline — Спецификация
+﻿# 📝 Farrow Pipeline — Спецификация
 
 > **Модули**: `Python_test/strategies/` + `modules/lch_farrow/` + `modules/capon/`
 > **Статус**: 🟢 Фаза 1 DONE | Фазы 2-4 в планах
@@ -437,7 +437,7 @@ W[b][a] = 1/√N    (все элементы одинаковые)
 
 - `scenario_builder.py` — генерация тестовых сигналов с физикой
 - `modules/lch_farrow/lagrange_matrix_48x5.json` — коэффициенты Лагранжа
-- `lch_farrow::LchFarrowROCm` — GPU версия (для будущей интеграции)
+- `dsp::spectrum::LchFarrowROCm` — GPU версия (для будущей интеграции)
 
 ---
 

@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: strategies
-class_fqn: strategies::PipelineBuilder
+class_fqn: dsp::strategies::PipelineBuilder
 file: E:/DSP-GPU/strategies/include/strategies/pipeline_builder.hpp
 line: 28
 brief: "Построитель пайплайнов с поддержкой последовательных и параллельных шагов"
@@ -15,7 +15,7 @@ synonyms_en: ['PipelineComposer', 'PipelineAssembler', 'PipelineConstructor', 'P
 tags: ['pipeline builder', 'DAG construction', 'parallel processing', 'GPU computing', 'step composition']
 ---
 
-# `strategies::PipelineBuilder` — карточка класса
+# `dsp::strategies::PipelineBuilder` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo strategies --class PipelineBuilder`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,8 +35,8 @@ tags: ['pipeline builder', 'DAG construction', 'parallel processing', 'GPU compu
 
 **Пример**:
 ```cpp
-#include "strategies/pipeline_builder.hpp"
-using namespace strategies;
+#include "dsp/strategies/pipeline_builder.hpp"
+using namespace dsp::strategies;
 
 auto pipeline = PipelineBuilder()
     .add_if(true, std::make_unique<FilterStep>())

@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: strategies
-class_fqn: strategies::Pipeline
+class_fqn: dsp::strategies::Pipeline
 file: E:/DSP-GPU/strategies/include/strategies/pipeline.hpp
 line: 36
 brief: "Управляет потоками выполнения и шагами обработки сигналов в GPU-пайплайне"
@@ -15,7 +15,7 @@ synonyms_en: ['Pipeline', 'SignalProcessor', 'GPUProcessing', 'ParallelExecution
 tags: ['GPU', 'ParallelProcessing', 'SignalProcessing', 'C++']
 ---
 
-# `strategies::Pipeline` — карточка класса
+# `dsp::strategies::Pipeline` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo strategies --class Pipeline`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,8 +35,8 @@ tags: ['GPU', 'ParallelProcessing', 'SignalProcessing', 'C++']
 
 **Пример**:
 ```cpp
-#include "strategies/pipeline.hpp"
-using namespace strategies;
+#include "dsp/strategies/pipeline.hpp"
+using namespace dsp::strategies;
 
 int main() {
   Pipeline pipeline;

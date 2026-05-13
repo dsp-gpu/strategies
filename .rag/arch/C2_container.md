@@ -1,4 +1,4 @@
----
+﻿---
 schema_version: 1
 repo: strategies
 arch_level: c2
@@ -6,7 +6,7 @@ tags:
   - "#level:c2"
   - "#repo:strategies"
   - "#layer:strategy"
-  - "#namespace:strategies"
+  - "#namespace:dsp_strategies"
   - "#namespace:test_strategies"
   - "#namespace:drv_gpu_lib"
 description: "C2 Container — namespace tree и зависимости репо strategies."

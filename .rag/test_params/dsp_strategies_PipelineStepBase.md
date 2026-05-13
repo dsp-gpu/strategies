@@ -1,7 +1,7 @@
----
+﻿---
 schema_version: 1
 repo: strategies
-class_fqn: strategies::PipelineStepBase
+class_fqn: dsp::strategies::PipelineStepBase
 file: E:/DSP-GPU/strategies/include/strategies/i_pipeline_step.hpp
 line: 34
 brief: "Базовый класс для шагов обработки в потоке, предоставляющий доступ к контексту PipelineContext"
@@ -15,7 +15,7 @@ synonyms_en: ['Pipeline Step Base', 'Context Step', 'Processing Step', 'Flow Ste
 tags: ['GPU', 'Pipeline', 'Context', 'Initialization']
 ---
 
-# `strategies::PipelineStepBase` — карточка класса
+# `dsp::strategies::PipelineStepBase` — карточка класса
 
 > **Этот файл генерируется автоматически** командой `dsp-asst rag cards build --repo strategies --class PipelineStepBase`.
 > Не править руками — правки потеряются при следующем refresh.
@@ -35,9 +35,9 @@ tags: ['GPU', 'Pipeline', 'Context', 'Initialization']
 
 **Пример**:
 ```cpp
-#include "strategies/i_pipeline_step.hpp"
+#include "dsp/strategies/i_pipeline_step.hpp"
 
-using namespace strategies;
+using namespace dsp::strategies;
 
 class MyStep : public PipelineStepBase {
 public:
