@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @file py_strategies_rocm.hpp
@@ -19,10 +19,10 @@
  * @date 2026-03-07
  */
 
-#include <strategies/antenna_processor_test.hpp>
-#include <strategies/weight_generator.hpp>
-#include <strategies/config/antenna_processor_config.hpp>
-#include <strategies/result_types.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/weight_generator.hpp>
+#include <dsp/strategies/config/antenna_processor_config.hpp>
+#include <dsp/strategies/result_types.hpp>
 
 #include <complex>
 #include <vector>
@@ -43,15 +43,15 @@ public:
       bool debug_mode = true)
       : ctx_(ctx)
   {
-    strategies::AntennaProcessorConfig cfg;
+    dsp::strategies::AntennaProcessorConfig cfg;
     cfg.n_ant               = n_ant;
     cfg.n_samples           = n_samples;
     cfg.sample_rate         = sample_rate;
     cfg.signal_frequency_hz = signal_frequency_hz;
-    cfg.scenario_mode       = strategies::PostFftScenarioMode::ALL_REQUIRED;
+    cfg.scenario_mode       = dsp::strategies::PostFftScenarioMode::ALL_REQUIRED;
     cfg.debug_mode          = debug_mode;
 
-    proc_ = std::make_unique<strategies::AntennaProcessorTest>(ctx.backend(), cfg);
+    proc_ = std::make_unique<dsp::strategies::AntennaProcessorTest>(ctx.backend(), cfg);
   }
 
   // Step 0: prepare input from numpy arrays
@@ -82,7 +82,7 @@ public:
 
   // Step 1: debug input stats
   py::dict step_1_debug_input() {
-    strategies::AntennaResult r;
+    dsp::strategies::AntennaResult r;
     {
       py::gil_scoped_release release;
       r = proc_->step_1_debug_input();
@@ -103,7 +103,7 @@ public:
 
   // Step 3: debug post-GEMM stats
   py::dict step_3_debug_post_gemm() {
-    strategies::AntennaResult r;
+    dsp::strategies::AntennaResult r;
     {
       py::gil_scoped_release release;
       r = proc_->step_3_debug_post_gemm();
@@ -125,7 +125,7 @@ public:
 
   // Step 5: debug post-FFT stats
   py::dict step_5_debug_post_fft() {
-    strategies::AntennaResult r;
+    dsp::strategies::AntennaResult r;
     {
       py::gil_scoped_release release;
       r = proc_->step_5_debug_post_fft();
@@ -135,7 +135,7 @@ public:
 
   // Step 6.1: OneMax + Parabola
   py::list step_6_1_one_max_parabola() {
-    strategies::AntennaResult r;
+    dsp::strategies::AntennaResult r;
     {
       py::gil_scoped_release release;
       r = proc_->step_6_1_one_max_parabola();
@@ -155,7 +155,7 @@ public:
 
   // Step 6.2: AllMaxima
   py::list step_6_2_all_maxima() {
-    strategies::AntennaResult r;
+    dsp::strategies::AntennaResult r;
     {
       py::gil_scoped_release release;
       r = proc_->step_6_2_all_maxima();
@@ -183,7 +183,7 @@ public:
 
   // Step 6.3: GlobalMinMax
   py::list step_6_3_global_minmax() {
-    strategies::AntennaResult r;
+    dsp::strategies::AntennaResult r;
     {
       py::gil_scoped_release release;
       r = proc_->step_6_3_global_minmax();
@@ -235,7 +235,7 @@ public:
 
   // Full pipeline using managed weights (after set_external_weights)
   py::dict process_full_managed_w() {
-    strategies::AntennaResult r;
+    dsp::strategies::AntennaResult r;
     {
       py::gil_scoped_release release;
       r = proc_->process_full_managed_w();
@@ -245,7 +245,7 @@ public:
 
   // Full pipeline
   py::dict process_full() {
-    strategies::AntennaResult r;
+    dsp::strategies::AntennaResult r;
     {
       py::gil_scoped_release release;
       r = proc_->process_full();
@@ -266,11 +266,11 @@ public:
 
 private:
   ROCmGPUContext& ctx_;
-  std::unique_ptr<strategies::AntennaProcessorTest> proc_;
+  std::unique_ptr<dsp::strategies::AntennaProcessorTest> proc_;
   void* d_S_ = nullptr;
   void* d_W_ = nullptr;
 
-  py::dict build_full_result(const strategies::AntennaResult& r) {
+  py::dict build_full_result(const dsp::strategies::AntennaResult& r) {
     py::dict result;
     result["total_ms"] = r.perf.total_ms;
     result["scenario_mode"] = static_cast<int>(r.scenario_mode);
@@ -299,7 +299,7 @@ private:
     return result;
   }
 
-  py::dict stats_to_dict(const std::vector<statistics::StatisticsResult>& stats) {
+  py::dict stats_to_dict(const std::vector<dsp::stats::StatisticsResult>& stats) {
     py::list beams;
     for (const auto& s : stats) {
       py::dict d;
@@ -327,13 +327,13 @@ public:
   static py::array_t<std::complex<float>> generate_delay_and_sum(
       uint32_t n_ant, double f0, double tau_base, double tau_step)
   {
-    strategies::WeightParams wp;
+    dsp::strategies::WeightParams wp;
     wp.n_ant    = n_ant;
     wp.f0       = f0;
     wp.tau_base = tau_base;
     wp.tau_step = tau_step;
 
-    auto W = strategies::WeightGenerator::generate_delay_and_sum(wp);
+    auto W = dsp::strategies::WeightGenerator::generate_delay_and_sum(wp);
     return vector_to_numpy_2d(std::move(W), n_ant, n_ant);
   }
 };

@@ -1,9 +1,9 @@
-#include <strategies/weight_generator.hpp>
+﻿#include <dsp/strategies/weight_generator.hpp>
 #include <core/interface/i_backend.hpp>
 
 #include <cmath>
 
-namespace strategies {
+namespace dsp::strategies {
 
 std::vector<std::complex<float>> WeightGenerator::generate_delay_and_sum(
     const WeightParams& params)
@@ -39,4 +39,4 @@ void* WeightGenerator::upload_to_gpu(
   return d_W;
 }
 
-}  // namespace strategies
+} // namespace dsp::strategies

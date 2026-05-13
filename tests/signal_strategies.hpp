@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // signal_strategies.hpp — конкретные стратегии генерации сигнала (GoF Strategy)
@@ -30,7 +30,7 @@
 
 #include <signal_generators/generators/form_signal_generator_rocm.hpp>
 #include <signal_generators/params/form_params.hpp>
-#include <spectrum/lch_farrow_rocm.hpp>
+#include <dsp/spectrum/lch_farrow_rocm.hpp>
 
 #include <core/interface/i_backend.hpp>
 
@@ -159,7 +159,7 @@ public:
     }
 
     // 3. Применяем LchFarrow
-    lch_farrow::LchFarrowROCm farrow(backend);
+    dsp::spectrum::LchFarrowROCm farrow(backend);
     farrow.SetDelays(delay_us);
     farrow.SetSampleRate(params.fs);
 

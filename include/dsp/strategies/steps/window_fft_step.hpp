@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // WindowFftStep — окно Hamming + zero-pad + batch FFT + magnitudes (Ref03-C Step)
@@ -50,17 +50,17 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/i_pipeline_step.hpp>
-#include <strategies/pipeline_context.hpp>
+#include <dsp/strategies/i_pipeline_step.hpp>
+#include <dsp/strategies/pipeline_context.hpp>
 
 #include <hip/hip_runtime.h>
 #include <hipfft/hipfft.h>
 #include <stdexcept>
 
 // Forward declaration
-namespace fft_processor { struct MagPhaseParams; }
+namespace dsp::spectrum { struct MagPhaseParams; }
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class WindowFftStep
@@ -70,7 +70,7 @@ namespace strategies {
  * @note Все операции на ctx.stream_main; в конце hipEventRecord(event_fft_done).
  * @note Magnitude без нормировки (inv_n=0): hipfft не делит на N, мы тоже не делим.
  * @see GemmStep                              — поставщик kBufX через event_gemm_done.
- * @see fft_processor::ComplexToMagPhaseROCm  — реализация magnitude (zero-alloc).
+ * @see dsp::spectrum::ComplexToMagPhaseROCm  — реализация magnitude (zero-alloc).
  */
 class WindowFftStep : public PipelineStepBase {
 public:
@@ -153,6 +153,6 @@ private:
   static constexpr unsigned int kBlockSize = 256;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

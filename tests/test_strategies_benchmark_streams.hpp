@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // test_strategies_benchmark_streams.hpp — benchmark: 1 stream vs 3 streams
@@ -22,7 +22,7 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
 #include <core/services/console_output.hpp>
 
 #include <hip/hip_runtime.h>
@@ -40,9 +40,9 @@ using namespace drv_gpu_lib;
 // Helper: benchmark accessor subclass
 // ============================================================================
 
-class BenchmarkProcessor : public strategies::AntennaProcessorTest {
+class BenchmarkProcessor : public dsp::strategies::AntennaProcessorTest {
 public:
-  using strategies::AntennaProcessorTest::AntennaProcessorTest;
+  using dsp::strategies::AntennaProcessorTest::AntennaProcessorTest;
 
   /// Prepare internal buffers: run GEMM + Window+FFT once (fills d_spectrum_, d_magnitudes_)
   void prepare_buffers(const void* d_S, const void* d_W) {
@@ -52,16 +52,16 @@ public:
   }
 
   /// Post-FFT scenarios: sequential 1-stream (timed part)
-  strategies::AntennaResult run_sequential() {
-    strategies::AntennaResult result;
+  dsp::strategies::AntennaResult run_sequential() {
+    dsp::strategies::AntennaResult result;
     result.scenario_mode = config().scenario_mode;
     do_run_post_fft_scenarios(result);
     return result;
   }
 
   /// Post-FFT scenarios: parallel 3-stream (timed part)
-  strategies::AntennaResult run_parallel() {
-    strategies::AntennaResult result;
+  dsp::strategies::AntennaResult run_parallel() {
+    dsp::strategies::AntennaResult result;
     result.scenario_mode = config().scenario_mode;
     do_run_post_fft_parallel(result);
     return result;
@@ -84,11 +84,11 @@ inline void run_benchmark_streams(drv_gpu_lib::IBackend* backend) {
   constexpr int      kNWarmup  = 3;
   constexpr int      kNRuns    = 20;
 
-  strategies::AntennaProcessorConfig cfg;
+  dsp::strategies::AntennaProcessorConfig cfg;
   cfg.n_ant      = kNAnt;
   cfg.n_samples  = kNSamples;
   cfg.sample_rate = 1e6f;
-  cfg.scenario_mode = strategies::PostFftScenarioMode::ALL_REQUIRED;
+  cfg.scenario_mode = dsp::strategies::PostFftScenarioMode::ALL_REQUIRED;
 
   BenchmarkProcessor proc(backend, cfg);
 

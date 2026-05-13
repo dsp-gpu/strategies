@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // strategies_profiling_benchmark.hpp — GPU профилирование per Step (T3)
@@ -25,7 +25,7 @@
 #if ENABLE_ROCM
 
 #include "strategy_test_base.hpp"
-#include <strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
 #include "signal_strategy_factory.hpp"
 
 #include <core/services/profiling/profiling_facade.hpp>
@@ -89,11 +89,11 @@ protected:
 
     // ── Конфиг: disable debug stats во время профилирования ──────────────
     cfg_.debug_mode = false;
-    cfg_.pre_input_stats = strategies::StatPreset::P62_MEAN_MED;  // лёгкая статистика
-    cfg_.post_gemm_stats = strategies::StatPreset::P62_MEAN_MED;
-    cfg_.post_fft_stats  = strategies::StatPreset::P62_MEAN_MED;
+    cfg_.pre_input_stats = dsp::strategies::StatPreset::P62_MEAN_MED;  // лёгкая статистика
+    cfg_.post_gemm_stats = dsp::strategies::StatPreset::P62_MEAN_MED;
+    cfg_.post_fft_stats  = dsp::strategies::StatPreset::P62_MEAN_MED;
 
-    strategies::AntennaProcessorTest proc(backend_, cfg_);
+    dsp::strategies::AntennaProcessorTest proc(backend_, cfg_);
     proc.step_0_prepare_input(d_S_, d_W_);
 
     // ── ProfilingFacade setup (order per rule 06) ────────────────────────

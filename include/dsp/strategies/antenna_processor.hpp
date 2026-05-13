@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // AntennaProcessor — абстрактный фасад pipeline'а обработки антенной решётки
@@ -48,10 +48,10 @@
 //   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
 // ============================================================================
 
-#include <strategies/config/antenna_processor_config.hpp>
-#include <strategies/result_types.hpp>
+#include <dsp/strategies/config/antenna_processor_config.hpp>
+#include <dsp/strategies/result_types.hpp>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class AntennaProcessor
@@ -106,4 +106,4 @@ public:
   virtual int gpu_id() const = 0;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

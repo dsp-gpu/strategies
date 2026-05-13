@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // IPipelineStep — контракт шага DSP-пайплайна (Ref03-C, Layer 6)
@@ -52,7 +52,7 @@
 
 #include <core/interface/i_gpu_operation.hpp>
 
-namespace strategies {
+namespace dsp::strategies {
 
 struct PipelineContext;
 struct AntennaProcessorConfig;
@@ -111,6 +111,6 @@ public:
   void Release() override {}
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

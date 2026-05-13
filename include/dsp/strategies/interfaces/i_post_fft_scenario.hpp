@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // IPostFftScenario — Strategy для post-FFT обработки одного спектра
@@ -47,7 +47,7 @@
 //   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
 // ============================================================================
 
-#include <strategies/result_types.hpp>
+#include <dsp/strategies/result_types.hpp>
 
 #include <cstdint>
 
@@ -55,7 +55,7 @@
 #include <hip/hip_runtime.h>
 #endif
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class IPostFftScenario
@@ -101,4 +101,4 @@ public:
   virtual const char* name() const = 0;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

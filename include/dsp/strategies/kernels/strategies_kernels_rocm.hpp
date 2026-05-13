@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @brief HIP kernel-source для pipeline AntennaProcessor (Hamming+pad / |FFT| / OneMax / MinMax).
@@ -27,7 +27,7 @@
 
 #if ENABLE_ROCM
 
-namespace strategies {
+namespace dsp::strategies {
 namespace kernels {
 
 inline const char* GetStrategiesHIPKernelSource() {
@@ -306,6 +306,6 @@ void one_max_no_phase(
 }
 
 }  // namespace kernels
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

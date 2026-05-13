@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // DebugStatsStep — статистика в debug-точках pipeline'а (Ref03-C Step)
@@ -52,14 +52,14 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/i_pipeline_step.hpp>
-#include <strategies/pipeline_context.hpp>
-#include <strategies/config/statistics_set.hpp>
-#include <stats/statistics_processor.hpp>
+#include <dsp/strategies/i_pipeline_step.hpp>
+#include <dsp/strategies/pipeline_context.hpp>
+#include <dsp/strategies/config/statistics_set.hpp>
+#include <dsp/stats/statistics_processor.hpp>
 
 #include <hip/hip_runtime.h>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @enum DebugPoint
@@ -124,7 +124,7 @@ public:
    * не ждёт (d_S уже на GPU по контракту caller'а).
    */
   void Execute(PipelineContext& ctx) override {
-    statistics::StatisticsParams sp;
+    dsp::stats::StatisticsParams sp;
     sp.beam_count = ctx.cfg->n_ant;
 
     switch (point_) {
@@ -175,6 +175,6 @@ private:
   DebugPoint point_;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

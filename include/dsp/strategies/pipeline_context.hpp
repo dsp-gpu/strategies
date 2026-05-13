@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @file pipeline_context.hpp
@@ -18,9 +18,9 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/config/antenna_processor_config.hpp>
-#include <strategies/result_types.hpp>
-#include <strategies/interfaces/i_checkpoint_save.hpp>
+#include <dsp/strategies/config/antenna_processor_config.hpp>
+#include <dsp/strategies/result_types.hpp>
+#include <dsp/strategies/interfaces/i_checkpoint_save.hpp>
 #include <core/services/buffer_set.hpp>
 
 #include <hip/hip_runtime.h>
@@ -29,11 +29,11 @@
 
 // Forward declarations
 namespace drv_gpu_lib   { class IBackend; class GpuContext; }
-namespace statistics    { class StatisticsProcessor; }
-namespace antenna_fft   { class AllMaximaPipelineROCm; }
-namespace fft_processor { class ComplexToMagPhaseROCm; }
+namespace dsp::stats    { class StatisticsProcessor; }
+namespace dsp::spectrum   { class AllMaximaPipelineROCm; }
+namespace dsp::spectrum { class ComplexToMagPhaseROCm; }
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @enum PipelineBuf
@@ -96,9 +96,9 @@ struct PipelineContext {
   int gpu_id = 0;
 
   // ── Sub-processors (owned by Facade, non-owning pointers) ─────────────
-  statistics::StatisticsProcessor*      stats_processor = nullptr;
-  antenna_fft::AllMaximaPipelineROCm*   all_maxima_pipeline = nullptr;
-  fft_processor::ComplexToMagPhaseROCm* complex_to_mag = nullptr;
+  dsp::stats::StatisticsProcessor*      stats_processor = nullptr;
+  dsp::spectrum::AllMaximaPipelineROCm*   all_maxima_pipeline = nullptr;
+  dsp::spectrum::ComplexToMagPhaseROCm* complex_to_mag = nullptr;
   ICheckpointSave*                      checkpoint = nullptr;
 
   // ── Per-call inputs (set before Pipeline::Execute) ────────────────────
@@ -119,6 +119,6 @@ struct PipelineContext {
   }
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

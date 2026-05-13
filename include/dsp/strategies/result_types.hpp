@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @file result_types.hpp
@@ -17,14 +17,14 @@
  *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
-#include <strategies/config/post_fft_scenario_mode.hpp>
-#include <spectrum/types/spectrum_result_types.hpp>
-#include <stats/statistics_types.hpp>
+#include <dsp/strategies/config/post_fft_scenario_mode.hpp>
+#include <dsp/spectrum/types/spectrum_result_types.hpp>
+#include <dsp/stats/statistics_types.hpp>
 
 #include <cstdint>
 #include <vector>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @struct OneMaxParabolaLite
@@ -86,21 +86,21 @@ struct PerfMetrics {
  */
 struct AntennaResult {
   // Debug point statistics
-  std::vector<statistics::StatisticsResult> pre_input_stats;  ///< 2.1: on d_S
-  std::vector<statistics::StatisticsResult> post_gemm_stats;  ///< 2.2: on d_X
-  std::vector<statistics::StatisticsResult> post_fft_stats;   ///< 2.3: on |spectrum|
+  std::vector<dsp::stats::StatisticsResult> pre_input_stats;  ///< 2.1: on d_S
+  std::vector<dsp::stats::StatisticsResult> post_gemm_stats;  ///< 2.2: on d_X
+  std::vector<dsp::stats::StatisticsResult> post_fft_stats;   ///< 2.3: on |spectrum|
 
-  std::vector<statistics::MedianResult> pre_input_medians;
-  std::vector<statistics::MedianResult> post_gemm_medians;
-  std::vector<statistics::MedianResult> post_fft_medians;
+  std::vector<dsp::stats::MedianResult> pre_input_medians;
+  std::vector<dsp::stats::MedianResult> post_gemm_medians;
+  std::vector<dsp::stats::MedianResult> post_fft_medians;
 
   // Post-FFT scenario results
   std::vector<OneMaxParabolaLite>              one_max;      ///< Step2.1
-  std::vector<antenna_fft::AllMaximaBeamResult> all_maxima;  ///< Step2.2
+  std::vector<dsp::spectrum::AllMaximaBeamResult> all_maxima;  ///< Step2.2
   std::vector<MinMaxResult>                    minmax;       ///< Step2.3
 
   PostFftScenarioMode scenario_mode = PostFftScenarioMode::ALL_REQUIRED;
   PerfMetrics perf;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

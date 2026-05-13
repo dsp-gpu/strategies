@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // test_strategies_pipeline.hpp — интеграционный тест AntennaProcessor pipeline
@@ -23,8 +23,8 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/antenna_processor_test.hpp>
-#include <strategies/weight_generator.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/weight_generator.hpp>
 #include <signal_generators/generators/form_signal_generator_rocm.hpp>
 
 #include <core/services/console_output.hpp>
@@ -71,27 +71,27 @@ inline void test_full_pipeline(drv_gpu_lib::IBackend* backend) {
   con.Print(gpu_id, mod, fmt("  Signal generated: %u ant x %u pts", fp.antennas, fp.points));
 
   // 2. Generate W matrix
-  strategies::WeightParams wp;
+  dsp::strategies::WeightParams wp;
   wp.n_ant    = fp.antennas;
   wp.f0       = fp.f0;
   wp.tau_base = fp.tau_base;
   wp.tau_step = fp.tau_step;
 
-  auto W_cpu = strategies::WeightGenerator::generate_delay_and_sum(wp);
-  void* d_W = strategies::WeightGenerator::upload_to_gpu(backend, W_cpu);
+  auto W_cpu = dsp::strategies::WeightGenerator::generate_delay_and_sum(wp);
+  void* d_W = dsp::strategies::WeightGenerator::upload_to_gpu(backend, W_cpu);
 
   con.Print(gpu_id, mod, fmt("  W matrix: %ux%u Delay-and-sum", wp.n_ant, wp.n_ant));
 
   // 3. Create processor
-  strategies::AntennaProcessorConfig cfg;
+  dsp::strategies::AntennaProcessorConfig cfg;
   cfg.n_ant               = fp.antennas;
   cfg.n_samples           = fp.points;
   cfg.sample_rate         = static_cast<float>(fp.fs);
   cfg.signal_frequency_hz = static_cast<float>(fp.f0);
-  cfg.scenario_mode       = strategies::PostFftScenarioMode::ALL_REQUIRED;
+  cfg.scenario_mode       = dsp::strategies::PostFftScenarioMode::ALL_REQUIRED;
   cfg.debug_mode          = true;
 
-  strategies::AntennaProcessorTest proc(backend, cfg);
+  dsp::strategies::AntennaProcessorTest proc(backend, cfg);
 
   // 4. Step-by-step test
   proc.step_0_prepare_input(input.data, d_W);
@@ -198,23 +198,23 @@ inline void test_external_weights(drv_gpu_lib::IBackend* backend) {
   auto input = gen.GenerateInputData();
 
   // 2. Процессор
-  strategies::AntennaProcessorConfig cfg;
+  dsp::strategies::AntennaProcessorConfig cfg;
   cfg.n_ant               = fp.antennas;
   cfg.n_samples           = fp.points;
   cfg.sample_rate         = static_cast<float>(fp.fs);
   cfg.signal_frequency_hz = static_cast<float>(fp.f0);
-  cfg.scenario_mode       = strategies::PostFftScenarioMode::ONE_MAX_PARABOLA;
+  cfg.scenario_mode       = dsp::strategies::PostFftScenarioMode::ONE_MAX_PARABOLA;
   cfg.debug_mode          = false;
 
-  strategies::AntennaProcessorTest proc(backend, cfg);
+  dsp::strategies::AntennaProcessorTest proc(backend, cfg);
 
   // 3. Загружаем W через set_external_weights (CPU → GPU managed)
-  strategies::WeightParams wp;
+  dsp::strategies::WeightParams wp;
   wp.n_ant    = fp.antennas;
   wp.f0       = fp.f0;
   wp.tau_base = fp.tau_base;
   wp.tau_step = fp.tau_step;
-  auto W_cpu = strategies::WeightGenerator::generate_delay_and_sum(wp);
+  auto W_cpu = dsp::strategies::WeightGenerator::generate_delay_and_sum(wp);
   proc.set_external_weights(W_cpu);
   con.Print(gpu_id, mod, fmt("  External weights uploaded: %zu complex elements", W_cpu.size()));
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // AntennaProcessor_v1 — ROCm-реализация pipeline'а антенной обработки (Strategy)
@@ -23,9 +23,9 @@
 //         референс), не меняя production-логику.
 //
 // ПОЧЕМУ: - Layer 6 Ref03 (Facade) — фасад потребителю, оркестратор внутри.
-//           Не делает kernel-launch'ей сам, делегирует statistics::
-//           StatisticsProcessor / antenna_fft::AllMaximaPipelineROCm /
-//           fft_processor::ComplexToMagPhaseROCm.
+//           Не делает kernel-launch'ей сам, делегирует dsp::stats::
+//           StatisticsProcessor / dsp::spectrum::AllMaximaPipelineROCm /
+//           dsp::spectrum::ComplexToMagPhaseROCm.
 //         - GpuContext ctx_ (Ref03 Layer 1) — единая точка для kernel
 //           compile/cache (HSACO disk-cache по CompileKey). compiled_ flag
 //           гарантирует ленивую компиляцию ровно один раз.
@@ -61,10 +61,10 @@
 //   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
 // ============================================================================
 
-#include <strategies/antenna_processor.hpp>
-#include <strategies/interfaces/i_checkpoint_save.hpp>
-#include <strategies/interfaces/i_post_fft_scenario.hpp>
-#include <strategies/checkpoint/null_checkpoint_save.hpp>
+#include <dsp/strategies/antenna_processor.hpp>
+#include <dsp/strategies/interfaces/i_checkpoint_save.hpp>
+#include <dsp/strategies/interfaces/i_post_fft_scenario.hpp>
+#include <dsp/strategies/checkpoint/null_checkpoint_save.hpp>
 
 #if ENABLE_ROCM
 #include <core/interface/gpu_context.hpp>
@@ -80,11 +80,11 @@
 
 // Forward declarations
 namespace drv_gpu_lib   { class IBackend; }
-namespace statistics    { class StatisticsProcessor; }
-namespace antenna_fft   { class AllMaximaPipelineROCm; }
-namespace fft_processor { class ComplexToMagPhaseROCm; }
+namespace dsp::stats    { class StatisticsProcessor; }
+namespace dsp::spectrum   { class AllMaximaPipelineROCm; }
+namespace dsp::spectrum { class ComplexToMagPhaseROCm; }
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class AntennaProcessor_v1
@@ -233,12 +233,12 @@ private:
   uint32_t nFFT_ = 0;
 
   // Components
-  std::unique_ptr<statistics::StatisticsProcessor> stats_processor_;
-  std::unique_ptr<antenna_fft::AllMaximaPipelineROCm> all_maxima_pipeline_;
-  std::unique_ptr<fft_processor::ComplexToMagPhaseROCm> complex_to_mag_;
+  std::unique_ptr<dsp::stats::StatisticsProcessor> stats_processor_;
+  std::unique_ptr<dsp::spectrum::AllMaximaPipelineROCm> all_maxima_pipeline_;
+  std::unique_ptr<dsp::spectrum::ComplexToMagPhaseROCm> complex_to_mag_;
   std::unique_ptr<ICheckpointSave> checkpoint_;
 
   static constexpr uint32_t kBlockSize = 256;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

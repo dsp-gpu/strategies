@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @brief enum PostFftScenarioMode — выбор post-FFT сценария AntennaProcessor.
@@ -15,7 +15,7 @@
 
 #include <cstdint>
 
-namespace strategies {
+namespace dsp::strategies {
 
 enum class PostFftScenarioMode : uint8_t {
   ALL_REQUIRED     = 0,  ///< Production: Step2.1 + Step2.2 + Step2.3
@@ -24,4 +24,4 @@ enum class PostFftScenarioMode : uint8_t {
   GLOBAL_MINMAX    = 3   ///< Step2.3 only: global MIN + MAX
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

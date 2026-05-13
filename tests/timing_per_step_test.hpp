@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // timing_per_step_test.hpp — быстрый замер времени каждого Step (T4)
@@ -24,7 +24,7 @@
 #if ENABLE_ROCM
 
 #include "strategy_test_base.hpp"
-#include <strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
 
 #include <core/services/console_output.hpp>
 
@@ -67,7 +67,7 @@ public:
 protected:
   void Execute() override {
     cfg_.debug_mode = false;
-    strategies::AntennaProcessorTest proc(backend_, cfg_);
+    dsp::strategies::AntennaProcessorTest proc(backend_, cfg_);
     proc.step_0_prepare_input(d_S_, d_W_);
 
     // Warmup: 1 полный прогон

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // NullCheckpointSave — Null Object реализация ICheckpointSave (production default)
@@ -37,9 +37,9 @@
 //   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
 // ============================================================================
 
-#include <strategies/interfaces/i_checkpoint_save.hpp>
+#include <dsp/strategies/interfaces/i_checkpoint_save.hpp>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class NullCheckpointSave
@@ -71,7 +71,7 @@ public:
    * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
    *
    */
-  void save_c2_stats(const statistics::StatisticsResult*, const statistics::StatisticsResult*,
+  void save_c2_stats(const dsp::stats::StatisticsResult*, const dsp::stats::StatisticsResult*,
                      uint32_t, int) override {}
   /**
    * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
@@ -90,4 +90,4 @@ public:
   void save_c4_one_max(const OneMaxParabolaLite*, uint32_t, int) override {}
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

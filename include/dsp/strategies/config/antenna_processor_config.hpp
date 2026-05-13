@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @brief Конфигурация AntennaProcessor — размеры, частоты, режим сценария, статистики, чекпоинты.
@@ -12,12 +12,12 @@
  *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
-#include <strategies/config/post_fft_scenario_mode.hpp>
-#include <strategies/config/statistics_set.hpp>
+#include <dsp/strategies/config/post_fft_scenario_mode.hpp>
+#include <dsp/strategies/config/statistics_set.hpp>
 
 #include <cstdint>
 
-namespace strategies {
+namespace dsp::strategies {
 
 struct CheckpointSaveConfig {
   bool c1_signal   = false;  ///< Save d_S (large!)
@@ -53,4 +53,4 @@ struct AntennaProcessorConfig {
   bool debug_mode = false;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

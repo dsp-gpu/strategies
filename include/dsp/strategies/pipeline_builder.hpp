@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // PipelineBuilder — fluent-конструктор Pipeline (Ref03-C, GoF Builder)
@@ -48,13 +48,13 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/pipeline.hpp>
+#include <dsp/strategies/pipeline.hpp>
 
 #include <hip/hip_runtime.h>
 #include <memory>
 #include <vector>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class PipelineBuilder
@@ -146,6 +146,6 @@ private:
   std::vector<ParallelGroup> parallel_groups_;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

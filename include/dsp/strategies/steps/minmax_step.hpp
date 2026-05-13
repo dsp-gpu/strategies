@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // MinMaxStep — глобальные MIN+MAX по лучу за один проход (Ref03-C Step)
@@ -41,13 +41,13 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/i_pipeline_step.hpp>
-#include <strategies/pipeline_context.hpp>
+#include <dsp/strategies/i_pipeline_step.hpp>
+#include <dsp/strategies/pipeline_context.hpp>
 
 #include <hip/hip_runtime.h>
 #include <stdexcept>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class MinMaxStep
@@ -125,6 +125,6 @@ private:
   static constexpr unsigned int kBlockSize = 256;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

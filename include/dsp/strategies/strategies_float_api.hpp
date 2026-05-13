@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // StrategiesFloatApi — публичный CPU-vector API post-FFT вычислений модуля strategies
@@ -8,7 +8,7 @@
 //         Три метода: OneMaxParabolaFromFloat (один пик + парабола на луч),
 //         GlobalMinMaxFromFloat (min+max+dynamic_range на луч),
 //         AllMaximaFromMagnitudes (все локальные максимумы на луч через
-//         antenna_fft::AllMaximaPipelineROCm). Каждый метод сам выделяет
+//         dsp::spectrum::AllMaximaPipelineROCm). Каждый метод сам выделяет
 //         GPU-буфер, делает H2D, запускает kernel, делает D2H, освобождает.
 //
 // ЗАЧЕМ:  Часть caller'ов (Python биндинги, unit-тесты, external tools) уже
@@ -37,7 +37,7 @@
 //           разбили на .hpp/.cpp + delegated kernel-compile в GpuContext.
 //
 // Использование:
-//   strategies::StrategiesFloatApi api(backend);
+//   dsp::strategies::StrategiesFloatApi api(backend);
 //   std::vector<float> mags(n_ant * nFFT);  // готовые модули спектра
 //   auto peaks = api.OneMaxParabolaFromFloat(mags, n_ant, nFFT, sample_rate);
 //   auto mm    = api.GlobalMinMaxFromFloat(mags, n_ant, nFFT, sample_rate);
@@ -51,9 +51,9 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/result_types.hpp>
+#include <dsp/strategies/result_types.hpp>
 #include <core/interface/i_backend.hpp>
-#include <spectrum/pipelines/all_maxima_pipeline_rocm.hpp>
+#include <dsp/spectrum/pipelines/all_maxima_pipeline_rocm.hpp>
 
 #include <hip/hip_runtime.h>
 
@@ -65,7 +65,7 @@
 // downstream includes (strategies_float_api is used by several callers).
 namespace drv_gpu_lib { class GpuContext; }
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class StrategiesFloatApi
@@ -140,10 +140,10 @@ public:
    * @return AllMaximaResult with beams vector
    *   @test_check result.beams.size() == beam_count
    */
-  antenna_fft::AllMaximaResult AllMaximaFromMagnitudes(
+  dsp::spectrum::AllMaximaResult AllMaximaFromMagnitudes(
       const std::vector<float>& mags,
       uint32_t beam_count, uint32_t nFFT, float sample_rate,
-      antenna_fft::OutputDestination dest = antenna_fft::OutputDestination::CPU,
+      dsp::spectrum::OutputDestination dest = dsp::spectrum::OutputDestination::CPU,
       uint32_t search_start = 1,
       uint32_t search_end = 0,
       uint32_t max_maxima_per_beam = 1000);
@@ -155,12 +155,12 @@ private:
   hipStream_t            stream_  = nullptr;
 
   std::unique_ptr<drv_gpu_lib::GpuContext>            ctx_;
-  std::unique_ptr<antenna_fft::AllMaximaPipelineROCm> all_maxima_;
+  std::unique_ptr<dsp::spectrum::AllMaximaPipelineROCm> all_maxima_;
 
   hipFunction_t minmax_kernel_  = nullptr;
   hipFunction_t one_max_kernel_ = nullptr;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

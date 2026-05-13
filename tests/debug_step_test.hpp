@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // debug_step_test.hpp — пошаговый тест каждого Step (T2)
@@ -23,8 +23,8 @@
 #if ENABLE_ROCM
 
 #include "strategy_test_base.hpp"
-#include <strategies/antenna_processor_test.hpp>
-#include <strategies/result_types.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/result_types.hpp>
 
 #include <core/services/console_output.hpp>
 
@@ -60,7 +60,7 @@ protected:
     // Включаем debug_mode для D2H копий в каждом шаге
     cfg_.debug_mode = true;
 
-    strategies::AntennaProcessorTest proc(backend_, cfg_);
+    dsp::strategies::AntennaProcessorTest proc(backend_, cfg_);
     proc.step_0_prepare_input(d_S_, d_W_);
     c.Print(0, "DebugStep", "  Step 0: input prepared");
 
@@ -162,8 +162,8 @@ private:
   std::string signal_strategy_name_ = "unknown";
 
   // Результаты по шагам
-  strategies::AntennaResult              r1_{}, r3_{}, r5_{};
-  strategies::AntennaResult              r61_{}, r62_{}, r63_{};
+  dsp::strategies::AntennaResult              r1_{}, r3_{}, r5_{};
+  dsp::strategies::AntennaResult              r61_{}, r62_{}, r63_{};
   std::vector<std::complex<float>>       X_{};
   std::vector<std::complex<float>>       spectrum_{};
   uint32_t                               nFFT_ = 0;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // test_strategies_step_profiling.hpp — GPU profiling каждого шага pipeline
@@ -33,8 +33,8 @@
 #include <hip/hip_runtime.h>
 #include <core/services/scoped_hip_event.hpp>
 
-#include <strategies/antenna_processor_test.hpp>
-#include <strategies/weight_generator.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/weight_generator.hpp>
 #include <signal_generators/generators/form_signal_generator_rocm.hpp>
 
 #include <core/services/console_output.hpp>
@@ -150,25 +150,25 @@ inline void run_step_profiling(drv_gpu_lib::IBackend* backend) {
   con.Print(gpu_id, "Strat_Prof", prof_buf);
 
   // ── 2. Generate W matrix ─────────────────────────────────────────────────
-  strategies::WeightParams wp;
+  dsp::strategies::WeightParams wp;
   wp.n_ant    = fp.antennas;
   wp.f0       = fp.f0;
   wp.tau_base = fp.tau_base;
   wp.tau_step = fp.tau_step;
 
-  auto W_cpu = strategies::WeightGenerator::generate_delay_and_sum(wp);
-  void* d_W = strategies::WeightGenerator::upload_to_gpu(backend, W_cpu);
+  auto W_cpu = dsp::strategies::WeightGenerator::generate_delay_and_sum(wp);
+  void* d_W = dsp::strategies::WeightGenerator::upload_to_gpu(backend, W_cpu);
 
   // ── 3. Create processor ──────────────────────────────────────────────────
-  strategies::AntennaProcessorConfig cfg;
+  dsp::strategies::AntennaProcessorConfig cfg;
   cfg.n_ant               = fp.antennas;
   cfg.n_samples           = fp.points;
   cfg.sample_rate         = kProfSampleRate;
   cfg.signal_frequency_hz = kProfF0;
-  cfg.scenario_mode       = strategies::PostFftScenarioMode::ALL_REQUIRED;
+  cfg.scenario_mode       = dsp::strategies::PostFftScenarioMode::ALL_REQUIRED;
   cfg.debug_mode          = false;  // no debug stats during profiling
 
-  strategies::AntennaProcessorTest proc(backend, cfg);
+  dsp::strategies::AntennaProcessorTest proc(backend, cfg);
   proc.step_0_prepare_input(input.data, d_W);
 
   // ── 4. GPUProfiler setup ─────────────────────────────────────────────────

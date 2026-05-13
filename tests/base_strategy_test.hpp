@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // base_strategy_test.hpp — полный pipeline тест AntennaProcessor (T1)
@@ -23,8 +23,8 @@
 #if ENABLE_ROCM
 
 #include "strategy_test_base.hpp"
-#include <strategies/antenna_processor_test.hpp>
-#include <strategies/result_types.hpp>
+#include <dsp/strategies/antenna_processor_test.hpp>
+#include <dsp/strategies/result_types.hpp>
 
 #include <core/services/console_output.hpp>
 
@@ -54,7 +54,7 @@ protected:
   // ── Execute: запуск полного pipeline ────────────────────────────────────
 
   void Execute() override {
-    strategies::AntennaProcessorTest proc(backend_, cfg_);
+    dsp::strategies::AntennaProcessorTest proc(backend_, cfg_);
     proc.step_0_prepare_input(d_S_, d_W_);
     result_ = proc.process_full();
 
@@ -101,7 +101,7 @@ protected:
   }
 
 private:
-  strategies::AntennaResult result_{};
+  dsp::strategies::AntennaResult result_{};
 };
 
 }  // namespace test_strategies

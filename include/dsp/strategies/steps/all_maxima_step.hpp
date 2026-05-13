@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // AllMaximaStep — поиск ВСЕХ локальных максимумов спектра (Ref03-C Step)
@@ -39,12 +39,12 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/i_pipeline_step.hpp>
-#include <strategies/pipeline_context.hpp>
+#include <dsp/strategies/i_pipeline_step.hpp>
+#include <dsp/strategies/pipeline_context.hpp>
 
-#include <spectrum/pipelines/all_maxima_pipeline_rocm.hpp>
+#include <dsp/spectrum/pipelines/all_maxima_pipeline_rocm.hpp>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class AllMaximaStep
@@ -54,7 +54,7 @@ namespace strategies {
  * @note search_start=1 (skip DC); search_end=0 = автоматический половинный диапазон nFFT/2.
  * @see OneMaxStep    — поиск ОДНОГО максимума (быстрее).
  * @see MinMaxStep    — глобальные min+max (без локальных пиков).
- * @see antenna_fft::AllMaximaPipelineROCm — реализация алгоритма.
+ * @see dsp::spectrum::AllMaximaPipelineROCm — реализация алгоритма.
  */
 class AllMaximaStep : public PipelineStepBase {
 public:
@@ -92,7 +92,7 @@ public:
         ctx.cfg->n_ant,
         ctx.nFFT,
         ctx.cfg->sample_rate,
-        antenna_fft::OutputDestination::CPU,
+        dsp::spectrum::OutputDestination::CPU,
         1,      // search_start (skip DC)
         0,      // search_end (0 = nFFT/2)
         ctx.cfg->maxima_limit);
@@ -101,6 +101,6 @@ public:
   }
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

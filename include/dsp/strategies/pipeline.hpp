@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // Pipeline — runner упорядоченной цепочки IPipelineStep (Ref03-C, Layer 6)
@@ -47,8 +47,8 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/i_pipeline_step.hpp>
-#include <strategies/pipeline_context.hpp>
+#include <dsp/strategies/i_pipeline_step.hpp>
+#include <dsp/strategies/pipeline_context.hpp>
 
 #include <hip/hip_runtime.h>
 
@@ -57,7 +57,7 @@
 #include <string>
 #include <cstring>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @struct ParallelGroup
@@ -146,6 +146,6 @@ private:
   std::vector<ParallelGroup> parallel_groups_;
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM

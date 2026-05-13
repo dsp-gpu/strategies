@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // AntennaProcessorTest — step-by-step test-обёртка над AntennaProcessor_v1
@@ -56,13 +56,13 @@
 //   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
 // ============================================================================
 
-#include <strategies/antenna_processor_v1.hpp>
-#include <strategies/weight_generator.hpp>
+#include <dsp/strategies/antenna_processor_v1.hpp>
+#include <dsp/strategies/weight_generator.hpp>
 
 #include <complex>
 #include <vector>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class AntennaProcessorTest
@@ -270,4 +270,4 @@ private:
   }
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

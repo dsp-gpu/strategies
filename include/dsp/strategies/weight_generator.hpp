@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // WeightGenerator — генератор Delay-and-Sum матрицы весов для beamforming
@@ -37,10 +37,10 @@
 //           выбран как типичный PRI для радарных сценариев DSP-GPU.
 //
 // Использование:
-//   strategies::WeightParams p;
+//   dsp::strategies::WeightParams p;
 //   p.n_ant = 16; p.f0 = 2.0e6; p.tau_step = 50e-6;
-//   auto W = strategies::WeightGenerator::generate_delay_and_sum(p);
-//   void* d_W = strategies::WeightGenerator::upload_to_gpu(backend, W);
+//   auto W = dsp::strategies::WeightGenerator::generate_delay_and_sum(p);
+//   void* d_W = dsp::strategies::WeightGenerator::upload_to_gpu(backend, W);
 //   processor.process(d_S, d_W);
 //   backend->Free(d_W);
 //
@@ -53,7 +53,7 @@
 #include <vector>
 #include <cstdint>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @struct WeightParams
@@ -104,4 +104,4 @@ public:
       const std::vector<std::complex<float>>& weights);
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies

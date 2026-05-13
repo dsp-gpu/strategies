@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // ============================================================================
 // GemmStep — взвешивание сигнала: X = W × S через hipBLAS CGEMM (Ref03-C Step)
@@ -43,14 +43,14 @@
 
 #if ENABLE_ROCM
 
-#include <strategies/i_pipeline_step.hpp>
-#include <strategies/pipeline_context.hpp>
+#include <dsp/strategies/i_pipeline_step.hpp>
+#include <dsp/strategies/pipeline_context.hpp>
 
 #include <hip/hip_runtime.h>
 #include <hipblas/hipblas.h>
 #include <stdexcept>
 
-namespace strategies {
+namespace dsp::strategies {
 
 /**
  * @class GemmStep
@@ -115,6 +115,6 @@ public:
   }
 };
 
-}  // namespace strategies
+} // namespace dsp::strategies
 
 #endif  // ENABLE_ROCM
