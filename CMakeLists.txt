@@ -27,14 +27,14 @@ add_library(DspStrategies::DspStrategies ALIAS DspStrategies)
 set_target_properties(DspStrategies PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_sources(DspStrategies PRIVATE
-  src/strategies/src/antenna_processor_v1.cpp
-  src/strategies/src/weight_generator.cpp
-  src/strategies/src/strategies_float_api.cpp
+  src/strategies/antenna_processor_v1.cpp
+  src/strategies/weight_generator.cpp
+  src/strategies/strategies_float_api.cpp
 )
 
 target_include_directories(DspStrategies
   PUBLIC
-    # Стандарт AMD: #include <strategies/steps/...>, <strategies/config/...>
+    # Стандарт DSP-GPU: #include <dsp/strategies/steps/...>, <dsp/strategies/config/...>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
     $<INSTALL_INTERFACE:include>
