@@ -124,7 +124,7 @@ public:
    * не ждёт (d_S уже на GPU по контракту caller'а).
    */
   void Execute(PipelineContext& ctx) override {
-    dsp::stats::StatisticsParams sp;
+    ::dsp::stats::StatisticsParams sp;
     sp.beam_count = ctx.cfg->n_ant;
 
     switch (point_) {

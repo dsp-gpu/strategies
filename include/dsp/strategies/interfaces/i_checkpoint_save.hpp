@@ -27,7 +27,7 @@
 //           принудительно копировать в host.
 //         - 4 группы префиксов (C1/C2/C3/C4) → симметрия с pipeline-этапами,
 //           легко вырезать checkpoint'ы по фазам через CheckpointSaveConfig.
-//         - dsp::stats::StatisticsResult forward — strategies НЕ зависит от
+//         - ::dsp::stats::StatisticsResult forward — strategies НЕ зависит от
 //           stats как от полного header'а. Только декларация в save_c2_stats.
 //
 // Использование:
@@ -122,8 +122,8 @@ public:
    *   @test { range=[0..GetDeviceCount()-1], value=0, error_values=[-1, GetDeviceCount(), 3.14] }
    */
   virtual void save_c2_stats(
-      const dsp::stats::StatisticsResult* pre_stats,
-      const dsp::stats::StatisticsResult* post_stats,
+      const ::dsp::stats::StatisticsResult* pre_stats,
+      const ::dsp::stats::StatisticsResult* post_stats,
       uint32_t n_ant, int gpu_id) = 0;
 
   /**

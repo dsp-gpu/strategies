@@ -54,7 +54,7 @@ namespace dsp::strategies {
  * @note search_start=1 (skip DC); search_end=0 = автоматический половинный диапазон nFFT/2.
  * @see OneMaxStep    — поиск ОДНОГО максимума (быстрее).
  * @see MinMaxStep    — глобальные min+max (без локальных пиков).
- * @see dsp::spectrum::AllMaximaPipelineROCm — реализация алгоритма.
+ * @see ::antenna_fft::AllMaximaPipelineROCm — реализация алгоритма.
  */
 class AllMaximaStep : public PipelineStepBase {
 public:
@@ -92,7 +92,7 @@ public:
         ctx.cfg->n_ant,
         ctx.nFFT,
         ctx.cfg->sample_rate,
-        dsp::spectrum::OutputDestination::CPU,
+        ::drv_gpu_lib::OutputDestination::CPU,
         1,      // search_start (skip DC)
         0,      // search_end (0 = nFFT/2)
         ctx.cfg->maxima_limit);

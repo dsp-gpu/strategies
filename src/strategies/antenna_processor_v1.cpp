@@ -88,14 +88,14 @@ AntennaProcessor_v1::AntennaProcessor_v1(
   create_fft_plan();
 
   // Create statistics processor
-  stats_processor_ = std::make_unique<dsp::stats::StatisticsProcessor>(backend_);
+  stats_processor_ = std::make_unique<::dsp::stats::StatisticsProcessor>(backend_);
 
   // Create AllMaxima pipeline (uses stream_debug3_ for post-FFT work)
-  all_maxima_pipeline_ = std::make_unique<dsp::spectrum::AllMaximaPipelineROCm>(
+  all_maxima_pipeline_ = std::make_unique<::antenna_fft::AllMaximaPipelineROCm>(
       stream_debug3_, backend_);
 
   // Create ComplexToMagPhaseROCm for zero-alloc magnitude conversion
-  complex_to_mag_ = std::make_unique<dsp::spectrum::ComplexToMagPhaseROCm>(backend_);
+  complex_to_mag_ = std::make_unique<::dsp::spectrum::ComplexToMagPhaseROCm>(backend_);
 
   // Default checkpoint: NullCheckpointSave
   checkpoint_ = std::make_unique<NullCheckpointSave>();
@@ -305,7 +305,7 @@ AntennaResult AntennaProcessor_v1::process(const void* d_S, const void* d_W) {
 void AntennaProcessor_v1::do_debug_point_21(const void* d_S, AntennaResult& result) {
   if (cfg_.pre_input_stats == StatPreset::NONE) return;
 
-  dsp::stats::StatisticsParams sp;
+  ::dsp::stats::StatisticsParams sp;
   sp.beam_count = cfg_.n_ant;
   sp.n_point    = cfg_.n_samples;
 
@@ -346,7 +346,7 @@ void AntennaProcessor_v1::do_gemm(const void* d_S, const void* d_W) {
 void AntennaProcessor_v1::do_debug_point_22(AntennaResult& result) {
   if (cfg_.post_gemm_stats == StatPreset::NONE) return;
 
-  dsp::stats::StatisticsParams sp;
+  ::dsp::stats::StatisticsParams sp;
   sp.beam_count = cfg_.n_ant;
   sp.n_point    = cfg_.n_samples;
 
@@ -394,7 +394,7 @@ void AntennaProcessor_v1::do_window_fft() {
   // 4. Compute magnitudes via fft_func (no extra alloc)
   //    Uses ComplexToMagPhaseROCm::ProcessMagnitudeToBuffer — writes to d_magnitudes_ directly
   {
-    dsp::spectrum::MagPhaseParams mp;
+    ::dsp::spectrum::MagPhaseParams mp;
     mp.beam_count  = n_ant;
     mp.n_point     = nFFT_;
     mp.norm_coeff  = 0.0f;  // no normalization (inv_n = 1)
@@ -405,7 +405,7 @@ void AntennaProcessor_v1::do_window_fft() {
 void AntennaProcessor_v1::do_debug_point_23(AntennaResult& result) {
   if (cfg_.post_fft_stats == StatPreset::NONE) return;
 
-  dsp::stats::StatisticsParams sp;
+  ::dsp::stats::StatisticsParams sp;
   sp.beam_count = cfg_.n_ant;
   sp.n_point    = nFFT_;
 
@@ -453,7 +453,7 @@ void AntennaProcessor_v1::do_run_post_fft_scenarios(AntennaResult& result) {
         n_ant,                  // beam_count
         nFFT_,                  // nFFT
         sr,                     // sample_rate
-        dsp::spectrum::OutputDestination::CPU,  // copy results to CPU
+        ::drv_gpu_lib::OutputDestination::CPU,  // copy results to CPU
         1,                      // search_start (skip DC bin)
         0,                      // search_end (0 = nFFT/2)
         1000);                  // max_maxima_per_beam
@@ -527,7 +527,7 @@ void AntennaProcessor_v1::do_run_post_fft_parallel(AntennaResult& result) {
         n_ant,
         nFFT_,
         sr,
-        dsp::spectrum::OutputDestination::CPU,
+        ::drv_gpu_lib::OutputDestination::CPU,
         1, 0, 1000);
     result.all_maxima = std::move(am_result.beams);
   }

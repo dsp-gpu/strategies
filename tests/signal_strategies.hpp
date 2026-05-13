@@ -28,8 +28,8 @@
 #include "i_signal_strategy.hpp"
 #include "antenna_test_params.hpp"
 
-#include <signal_generators/generators/form_signal_generator_rocm.hpp>
-#include <signal_generators/params/form_params.hpp>
+#include <dsp/signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <dsp/signal_generators/params/form_params.hpp>
 #include <dsp/spectrum/lch_farrow_rocm.hpp>
 
 #include <core/interface/i_backend.hpp>
@@ -50,9 +50,9 @@ namespace test_strategies {
 namespace detail {
 
 /// Строит FormParams на основе AntennaTestParams и fdev/tau_step
-inline signal_gen::FormParams MakeFormParams(const AntennaTestParams& p,
+inline ::dsp::signal_generators::FormParams MakeFormParams(const AntennaTestParams& p,
                                              float fdev, float tau_step_us) {
-  signal_gen::FormParams fp;
+  ::dsp::signal_generators::FormParams fp;
   fp.antennas        = p.n_ant;
   fp.points          = p.n_samples;
   fp.fs              = static_cast<double>(p.fs);
@@ -69,8 +69,8 @@ inline signal_gen::FormParams MakeFormParams(const AntennaTestParams& p,
 inline SignalData GenerateViaFormGen(drv_gpu_lib::IBackend* backend,
                                      const AntennaTestParams& p,
                                      float fdev, float tau_step_us) {
-  signal_gen::FormParams fp = MakeFormParams(p, fdev, tau_step_us);
-  signal_gen::FormSignalGeneratorROCm gen(backend);
+  ::dsp::signal_generators::FormParams fp = MakeFormParams(p, fdev, tau_step_us);
+  ::dsp::signal_generators::FormSignalGeneratorROCm gen(backend);
   gen.SetParams(fp);
   auto input = gen.GenerateInputData();  // returns InputData<void*>
 

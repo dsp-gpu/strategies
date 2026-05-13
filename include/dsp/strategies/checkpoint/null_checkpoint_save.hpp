@@ -71,7 +71,7 @@ public:
    * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).
    *
    */
-  void save_c2_stats(const dsp::stats::StatisticsResult*, const dsp::stats::StatisticsResult*,
+  void save_c2_stats(const ::dsp::stats::StatisticsResult*, const ::dsp::stats::StatisticsResult*,
                      uint32_t, int) override {}
   /**
    * @brief Null Object: no-op (zero overhead — devirtualized + inline пустое тело).

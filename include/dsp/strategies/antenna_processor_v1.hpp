@@ -23,9 +23,9 @@
 //         референс), не меняя production-логику.
 //
 // ПОЧЕМУ: - Layer 6 Ref03 (Facade) — фасад потребителю, оркестратор внутри.
-//           Не делает kernel-launch'ей сам, делегирует dsp::stats::
-//           StatisticsProcessor / dsp::spectrum::AllMaximaPipelineROCm /
-//           dsp::spectrum::ComplexToMagPhaseROCm.
+//           Не делает kernel-launch'ей сам, делегирует ::dsp::stats::
+//           StatisticsProcessor / ::antenna_fft::AllMaximaPipelineROCm /
+//           ::dsp::spectrum::ComplexToMagPhaseROCm.
 //         - GpuContext ctx_ (Ref03 Layer 1) — единая точка для kernel
 //           compile/cache (HSACO disk-cache по CompileKey). compiled_ flag
 //           гарантирует ленивую компиляцию ровно один раз.
@@ -62,6 +62,7 @@
 // ============================================================================
 
 #include <dsp/strategies/antenna_processor.hpp>
+#include <dsp/spectrum/pipelines/all_maxima_pipeline_rocm.hpp>
 #include <dsp/strategies/interfaces/i_checkpoint_save.hpp>
 #include <dsp/strategies/interfaces/i_post_fft_scenario.hpp>
 #include <dsp/strategies/checkpoint/null_checkpoint_save.hpp>
@@ -233,9 +234,9 @@ private:
   uint32_t nFFT_ = 0;
 
   // Components
-  std::unique_ptr<dsp::stats::StatisticsProcessor> stats_processor_;
-  std::unique_ptr<dsp::spectrum::AllMaximaPipelineROCm> all_maxima_pipeline_;
-  std::unique_ptr<dsp::spectrum::ComplexToMagPhaseROCm> complex_to_mag_;
+  std::unique_ptr<::dsp::stats::StatisticsProcessor> stats_processor_;
+  std::unique_ptr<::antenna_fft::AllMaximaPipelineROCm> all_maxima_pipeline_;
+  std::unique_ptr<::dsp::spectrum::ComplexToMagPhaseROCm> complex_to_mag_;
   std::unique_ptr<ICheckpointSave> checkpoint_;
 
   static constexpr uint32_t kBlockSize = 256;

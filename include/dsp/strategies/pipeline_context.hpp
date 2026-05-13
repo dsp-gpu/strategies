@@ -96,9 +96,9 @@ struct PipelineContext {
   int gpu_id = 0;
 
   // ── Sub-processors (owned by Facade, non-owning pointers) ─────────────
-  dsp::stats::StatisticsProcessor*      stats_processor = nullptr;
-  dsp::spectrum::AllMaximaPipelineROCm*   all_maxima_pipeline = nullptr;
-  dsp::spectrum::ComplexToMagPhaseROCm* complex_to_mag = nullptr;
+  ::dsp::stats::StatisticsProcessor*      stats_processor = nullptr;
+  ::antenna_fft::AllMaximaPipelineROCm*   all_maxima_pipeline = nullptr;
+  ::dsp::spectrum::ComplexToMagPhaseROCm* complex_to_mag = nullptr;
   ICheckpointSave*                      checkpoint = nullptr;
 
   // ── Per-call inputs (set before Pipeline::Execute) ────────────────────

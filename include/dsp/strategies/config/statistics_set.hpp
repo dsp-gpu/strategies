@@ -6,7 +6,7 @@
  * @note Тип B (technical header): enum-флаги (mean / median / std / var / min / max) + alias
  *       StatisticsSet = uint32_t + namespace StatPreset с пресетами P61_ALL, P62_MEAN_MED, P63_MED_MM, P64_STD_VAR.
  *       Используется в AntennaProcessorConfig для трёх debug-точек (pre_input / post_gemm / post_fft).
- *       Битовая маска → один проход dsp::stats::StatisticsProcessor отдаёт ровно нужные поля.
+ *       Битовая маска → один проход ::dsp::stats::StatisticsProcessor отдаёт ровно нужные поля.
  *
  * История:
  *   - Создан:  2026-03-07

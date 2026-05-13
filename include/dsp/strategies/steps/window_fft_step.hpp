@@ -70,7 +70,7 @@ namespace dsp::strategies {
  * @note Все операции на ctx.stream_main; в конце hipEventRecord(event_fft_done).
  * @note Magnitude без нормировки (inv_n=0): hipfft не делит на N, мы тоже не делим.
  * @see GemmStep                              — поставщик kBufX через event_gemm_done.
- * @see dsp::spectrum::ComplexToMagPhaseROCm  — реализация magnitude (zero-alloc).
+ * @see ::dsp::spectrum::ComplexToMagPhaseROCm  — реализация magnitude (zero-alloc).
  */
 class WindowFftStep : public PipelineStepBase {
 public:

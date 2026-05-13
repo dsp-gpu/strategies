@@ -35,7 +35,7 @@
 
 #include <dsp/strategies/antenna_processor_test.hpp>
 #include <dsp/strategies/weight_generator.hpp>
-#include <signal_generators/generators/form_signal_generator_rocm.hpp>
+#include <dsp/signal_generators/generators/form_signal_generator_rocm.hpp>
 
 #include <core/services/console_output.hpp>
 #include <core/services/profiling/profiling_facade.hpp>
@@ -132,7 +132,7 @@ inline void run_step_profiling(drv_gpu_lib::IBackend* backend) {
   con.Print(gpu_id, "Strat_Prof", "════════════════════════════════════════════════");
 
   // ── 1. Generate test signal ──────────────────────────────────────────────
-  signal_gen::FormParams fp;
+  ::dsp::signal_generators::FormParams fp;
   fp.antennas        = kProfNAnt;
   fp.points          = kProfNSamples;
   fp.fs              = static_cast<double>(kProfSampleRate);
@@ -142,7 +142,7 @@ inline void run_step_profiling(drv_gpu_lib::IBackend* backend) {
   fp.tau_base        = 0.0;
   fp.tau_step        = 100e-6;
 
-  signal_gen::FormSignalGeneratorROCm gen(backend);
+  ::dsp::signal_generators::FormSignalGeneratorROCm gen(backend);
   gen.SetParams(fp);
   auto input = gen.GenerateInputData();
 

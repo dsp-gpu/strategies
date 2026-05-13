@@ -41,7 +41,7 @@ StrategiesFloatApi::StrategiesFloatApi(drv_gpu_lib::IBackend* backend)
   if (!stream_)
     throw std::runtime_error("StrategiesFloatApi: failed to get HIP stream");
 
-  all_maxima_ = std::make_unique<dsp::spectrum::AllMaximaPipelineROCm>(stream_, backend_);
+  all_maxima_ = std::make_unique<::antenna_fft::AllMaximaPipelineROCm>(stream_, backend_);
 
   // GpuContext v2 — compile + disk cache via CompileKey.
   ctx_ = std::make_unique<drv_gpu_lib::GpuContext>(
@@ -173,10 +173,10 @@ std::vector<MinMaxResult> StrategiesFloatApi::GlobalMinMaxFromFloat(
 // AllMaximaFromMagnitudes
 // ============================================================================
 
-dsp::spectrum::AllMaximaResult StrategiesFloatApi::AllMaximaFromMagnitudes(
+::antenna_fft::AllMaximaResult StrategiesFloatApi::AllMaximaFromMagnitudes(
     const std::vector<float>& mags,
     uint32_t beam_count, uint32_t nFFT, float sample_rate,
-    dsp::spectrum::OutputDestination dest,
+    ::drv_gpu_lib::OutputDestination dest,
     uint32_t search_start,
     uint32_t search_end,
     uint32_t max_maxima_per_beam)
