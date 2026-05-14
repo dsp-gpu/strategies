@@ -28,10 +28,12 @@
 #include <dsp/signal_generators/generators/form_signal_generator_rocm.hpp>
 
 #include <core/services/console_output.hpp>
+#include <test_utils/validators/numeric.hpp>  // gpu_test_utils::*
 
 #include <cmath>
 #include <cassert>
 #include <cstdio>
+#include <stdexcept>
 #include <string>
 
 namespace test_strategies {
@@ -100,12 +102,22 @@ inline void test_full_pipeline(drv_gpu_lib::IBackend* backend) {
   // Step 1: debug input
   auto r1 = proc.step_1_debug_input();
   con.Print(gpu_id, mod, fmt("  Step 1: pre_input_stats: %zu beams", r1.pre_input_stats.size()));
-  assert(r1.pre_input_stats.size() == fp.antennas);
+  {
+    auto v = gpu_test_utils::ScalarEqError(
+        r1.pre_input_stats.size(), static_cast<size_t>(fp.antennas),
+        "step1_pre_input_stats_beams");
+    if (!v.passed) throw std::runtime_error("Step 1: " + v.metric_name + " " + v.message);
+  }
 
   // Step 2: GEMM
   auto X = proc.step_2_gemm();
   con.Print(gpu_id, mod, fmt("  Step 2: GEMM done, X size=%zu complex", X.size()));
-  assert(X.size() == static_cast<size_t>(fp.antennas) * fp.points);
+  {
+    auto v = gpu_test_utils::ScalarEqError(
+        X.size(), static_cast<size_t>(fp.antennas) * fp.points,
+        "step2_gemm_output_size");
+    if (!v.passed) throw std::runtime_error("Step 2: " + v.metric_name + " " + v.message);
+  }
 
   // Step 3: debug post-GEMM
   auto r3 = proc.step_3_debug_post_gemm();
@@ -116,7 +128,12 @@ inline void test_full_pipeline(drv_gpu_lib::IBackend* backend) {
   uint32_t nFFT = proc.test_get_nFFT();
   con.Print(gpu_id, mod, fmt("  Step 4: Window+FFT done, nFFT=%u, spectrum size=%zu",
                               nFFT, spectrum.size()));
-  assert(spectrum.size() == static_cast<size_t>(fp.antennas) * nFFT);
+  {
+    auto v = gpu_test_utils::ScalarEqError(
+        spectrum.size(), static_cast<size_t>(fp.antennas) * nFFT,
+        "step4_window_fft_output_size");
+    if (!v.passed) throw std::runtime_error("Step 4: " + v.metric_name + " " + v.message);
+  }
 
   // Step 5: debug post-FFT
   auto r5 = proc.step_5_debug_post_fft();
@@ -146,7 +163,12 @@ inline void test_full_pipeline(drv_gpu_lib::IBackend* backend) {
                                 r63.minmax[0].min_magnitude, r63.minmax[0].min_bin,
                                 r63.minmax[0].max_magnitude, r63.minmax[0].max_bin,
                                 r63.minmax[0].dynamic_range_dB));
-    assert(r63.minmax[0].max_magnitude >= r63.minmax[0].min_magnitude);
+    {
+      auto v = gpu_test_utils::LowerBoundError(
+          r63.minmax[0].max_magnitude - r63.minmax[0].min_magnitude, -1e-9f,
+          "step6_3_max_ge_min");
+      if (!v.passed) throw std::runtime_error("Step 6.3: " + v.metric_name + " " + v.message);
+    }
   }
 
   // 5. Full pipeline test
@@ -226,13 +248,21 @@ inline void test_external_weights(drv_gpu_lib::IBackend* backend) {
   con.Print(gpu_id, mod, fmt("  process_full_managed_w: total=%.2f ms", result.perf.total_ms));
 
   // 6. Проверка: пик ≈ f0
-  assert(!result.one_max.empty());
+  {
+    auto v = gpu_test_utils::LowerBoundError(
+        static_cast<int>(result.one_max.size()), 0, "external_weights_has_peaks");
+    if (!v.passed) throw std::runtime_error("external_weights: " + v.metric_name + " " + v.message);
+  }
   float found_freq = result.one_max[0].refined_freq_hz;
   float freq_err   = std::abs(found_freq - static_cast<float>(fp.f0));
   float freq_res   = static_cast<float>(fp.fs) / proc.test_get_nFFT();
   con.Print(gpu_id, mod, fmt("  Beam 0: found_freq=%.1f Hz (f0=%.1f Hz, err=%.1f Hz, 1bin=%.1f Hz)",
                               found_freq, fp.f0, freq_err, freq_res));
-  assert(freq_err < 2.0f * freq_res);
+  {
+    auto v = gpu_test_utils::UpperBoundError(
+        freq_err, 2.0f * freq_res, "external_weights_freq_err");
+    if (!v.passed) throw std::runtime_error("external_weights: " + v.metric_name + " " + v.message);
+  }
 
   // Cleanup
   hipFree(input.data);
