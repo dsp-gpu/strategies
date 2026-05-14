@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: strategies
 class_fqn: dsp::spectrum::AllMaximaPipelineROCm
-file: E:/DSP-GPU/strategies/include/strategies/pipeline_context.hpp
-line: 31
-brief: "Обрабатывает массивы данных с использованием FFT на GPU ROCm для поиска максимумов в спектре."
+file: /home/alex/DSP-GPU/strategies/include/dsp/strategies/pipeline_context.hpp
+line: 33
+brief: "Layer-6 класс dsp::spectrum::AllMaximaPipelineROCm"
 methods_total: 0
 methods_with_doxygen: 0
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['PipelineROCm', 'FFTMaximaProcessor', 'AntennaSignalProcessor', 'GPUMaximaFinder']
-synonyms_en: ['ROCmPipeline', 'FFTMaximaFinder', 'AntennaSignalProcessor', 'GPUMaximaFinder']
-tags: ['GPU', 'ROCm', 'FFT', 'SignalProcessing', 'Radar', 'Pipeline']
+parser_version: 1
 ---
 
 # `dsp::spectrum::AllMaximaPipelineROCm` — карточка класса
@@ -27,25 +24,14 @@ tags: ['GPU', 'ROCm', 'FFT', 'SignalProcessing', 'Radar', 'Pipeline']
 
 <!-- rag-block: id=strategies__all_maxima_pipeline_rocm__class_overview__v1 -->
 
-**ЧТО**: Обрабатывает массивы данных с использованием FFT на GPU ROCm для поиска максимумов в спектре.
-
-**ЗАЧЕМ**: Оптимизирует вычисления поиска максимумов в спектре для радиолокационных задач, ускоряя обработку больших объемов данных.
-
-**КАК**: Использует HIP для GPU-вычислений, оптимизирован для ROCm. Поддерживает батч-обработку и кэширование промежуточных данных.
-
-**Пример**:
-```cpp
-#include "pipeline_context.hpp"
-using namespace antenna_fft;
-AllMaximaPipelineROCm pipeline;
-pipeline.configure(1024, 2048);
-std::vector<float> input(1024 * 2048);
-// заполнение input
-pipeline.process(input);
-std::vector<int> maxima = pipeline.get_maxima();
-```
+_TODO: краткое описание AllMaximaPipelineROCm (LLM не доступен)._
 
 <!-- /rag-block -->
+
+## Связанные секции из Doc/
+
+- `strategies__meta__claude_card__v1` (meta_claude): <!-- type:meta_claude repo:strategies source:strategies/CLAUDE.md -->  # strategies — Repository Card  _Источник: `strategies/CLAUDE.md`_  # 🤖 CLAUDE — `strategies`  > Композиционные стратегии: `IPipe…
+- `strategies__patterns__strategy_002__v1` (strategy): - **`dsp::strategies::DebugStatsStep`** — `strategies/include/strategies/steps/debug_stats_step.hpp:30`   - Параметризованный pipeline-шаг с тремя инстансами по точке наблюдения (DebugPoint::PRE_INPUT…
 
 ## Public-методы (0)
 

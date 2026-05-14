@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: strategies
 class_fqn: dsp::strategies::PipelineStepBase
-file: E:/DSP-GPU/strategies/include/strategies/i_pipeline_step.hpp
-line: 34
-brief: "Базовый класс для шагов обработки в потоке, предоставляющий доступ к контексту PipelineContext"
+file: /home/alex/DSP-GPU/strategies/include/dsp/strategies/i_pipeline_step.hpp
+line: 99
+brief: "/**  * @class PipelineStepBase  * @brief Удобная база: пустые Initialize/IsReady/Release для шагов без своих GPU-ресурсов.  *  * @note Большинство шагов берут ресурсы из PipelineContext, не из GpuCont"
 methods_total: 2
 methods_with_doxygen: 2
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['Базовый шаг потока', 'Контекстный шаг', 'Шаг обработки', 'Потоковый шаг']
-synonyms_en: ['Pipeline Step Base', 'Context Step', 'Processing Step', 'Flow Step']
-tags: ['GPU', 'Pipeline', 'Context', 'Initialization']
+parser_version: 1
 ---
 
 # `dsp::strategies::PipelineStepBase` — карточка класса
@@ -27,37 +24,20 @@ tags: ['GPU', 'Pipeline', 'Context', 'Initialization']
 
 <!-- rag-block: id=strategies__pipeline_step_base__class_overview__v1 -->
 
-**ЧТО**: Базовый класс для шагов обработки в потоке, предоставляющий доступ к контексту PipelineContext
-
-**ЗАЧЕМ**: Упрощает получение контекста PipelineContext вместо GpuContext, уменьшая дублирование кода
-
-**КАК**: Использует lazy initialization для методов Initialize/Release, абстрагируясь от GpuContext
-
-**Пример**:
-```cpp
-#include "dsp/strategies/i_pipeline_step.hpp"
-
-using namespace dsp::strategies;
-
-class MyStep : public PipelineStepBase {
-public:
-    void Initialize(GpuContext&) override {
-        // Реализация инициализации
-    }
-    void Release() override {
-        // Освобождение ресурсов
-    }
-};
-
-int main() {
-    MyStep step;
-    step.Initialize(...);
-    step.Release();
-    return 0;
-}
-```
+/**
+ * @class PipelineStepBase
+ * @brief Удобная база: пустые Initialize/IsReady/Release для шагов без своих GPU-ресурсов.
+ *
+ * @note Большинство шагов берут ресурсы из PipelineContext, не из GpuContext.
+ *       Если шаг сам держит kernel handle — переопределить Initialize/Release.
+ */
 
 <!-- /rag-block -->
+
+## Связанные секции из Doc/
+
+- `strategies__meta__claude_card__v1` (meta_claude): <!-- type:meta_claude repo:strategies source:strategies/CLAUDE.md -->  # strategies — Repository Card  _Источник: `strategies/CLAUDE.md`_  # 🤖 CLAUDE — `strategies`  > Композиционные стратегии: `IPipe…
+- `strategies__patterns__strategy_002__v1` (strategy): - **`dsp::strategies::DebugStatsStep`** — `strategies/include/strategies/steps/debug_stats_step.hpp:30`   - Параметризованный pipeline-шаг с тремя инстансами по точке наблюдения (DebugPoint::PRE_INPUT…
 
 ## Public-методы (2)
 
@@ -73,9 +53,9 @@ void Initialize(drv_gpu_lib::GpuContext&) override
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief No-op: pipeline-шаги берут ресурсы из PipelineContext, а не из GpuContext.
-   *
+/**
+   * @brief No-op: pipeline-шаги берут ресурсы из PipelineContext, а не из GpuContext.
+   *
    */
 ```
 
@@ -88,8 +68,8 @@ void Release() override
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief No-op: ресурсы pipeline-шагов освобождаются вместе с PipelineContext.
+/**
+   * @brief No-op: ресурсы pipeline-шагов освобождаются вместе с PipelineContext.
    */
 ```
 

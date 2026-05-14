@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: strategies
 class_fqn: dsp::strategies::Pipeline
-file: E:/DSP-GPU/strategies/include/strategies/pipeline.hpp
-line: 36
-brief: "Управляет потоками выполнения и шагами обработки сигналов в GPU-пайплайне"
+file: /home/alex/DSP-GPU/strategies/include/dsp/strategies/pipeline.hpp
+line: 82
+brief: "/**  * @class Pipeline  * @brief Runner упорядоченной цепочки IPipelineStep (sequential + parallel groups).  *  * @note Immutable после build() — структура entries_ не меняется.  * @note Execute(ctx)"
 methods_total: 2
 methods_with_doxygen: 2
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['Пайплайн', 'SignalProcessor', 'GPUProcessing', 'ParallelExecution']
-synonyms_en: ['Pipeline', 'SignalProcessor', 'GPUProcessing', 'ParallelExecution']
-tags: ['GPU', 'ParallelProcessing', 'SignalProcessing', 'C++']
+parser_version: 1
 ---
 
 # `dsp::strategies::Pipeline` — карточка класса
@@ -27,28 +24,16 @@ tags: ['GPU', 'ParallelProcessing', 'SignalProcessing', 'C++']
 
 <!-- rag-block: id=strategies__pipeline__class_overview__v1 -->
 
-**ЧТО**: Управляет потоками выполнения и шагами обработки сигналов в GPU-пайплайне
-
-**ЗАЧЕМ**: Оптимизирует обработку сигналов на GPU с поддержкой параллелизма и синхронизации потоков
-
-**КАК**: Использует HIP для синхронизации параллельных потоков, разделяет шаги на последовательные и параллельные группы, кэширует шаги для быстрого поиска
-
-**Пример**:
-```cpp
-#include "dsp/strategies/pipeline.hpp"
-using namespace dsp::strategies;
-
-int main() {
-  Pipeline pipeline;
-  pipeline.AddStep("stats", std::make_unique<StatsStep>());
-  pipeline.AddStep("gemm", std::make_unique<GEMMStep>());
-  PipelineContext ctx;
-  ctx.cfg->SetParam("save_input", true);
-  pipeline.Execute(ctx);
-  IPipelineStep* step = pipeline.FindStep("stats");
-  return 0;
-}
-```
+/**
+ * @class Pipeline
+ * @brief Runner упорядоченной цепочки IPipelineStep (sequential + parallel groups).
+ *
+ * @note Immutable после build() — структура entries_ не меняется.
+ * @note Execute(ctx) проверяет IsEnabled(cfg) ДО вызова шага (отключённые скипаются).
+ * @see PipelineBuilder — единственный способ построения (friend access).
+ * @see IPipelineStep   — контракт шага.
+ * @see PipelineContext — shared state, передаётся в Execute.
+ */
 
 <!-- /rag-block -->
 
@@ -74,14 +59,14 @@ void Execute(PipelineContext& ctx) { for (auto& entry : entries_) { if (entry.ty
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Выполнить все шаги в порядке entries_, скипая отключённые (IsEnabled==false).
-   * @param ctx Shared context: kernels, streams, buffers, result.
-   *   @test { values=["valid_backend"] }
-   *
-   * Для PARALLEL-группы все шаги запускаются последовательно (они стоят на разных
-   * streams и параллелятся на GPU), затем hipStreamSynchronize по всем streams
-   * группы — гарантия что следующий шаг увидит результаты.
+/**
+   * @brief Выполнить все шаги в порядке entries_, скипая отключённые (IsEnabled==false).
+   * @param ctx Shared context: kernels, streams, buffers, result.
+   *   @test { values=["valid_backend"] }
+   *
+   * Для PARALLEL-группы все шаги запускаются последовательно (они стоят на разных
+   * streams и параллелятся на GPU), затем hipStreamSynchronize по всем streams
+   * группы — гарантия что следующий шаг увидит результаты.
    */
 ```
 
@@ -99,14 +84,14 @@ IPipelineStep* FindStep(const char* name) const { for (auto& s : all_steps_) { i
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Найти шаг по Name() (линейный O(N) поиск).
-   * @param name Имя шага (как возвращает IPipelineStep::Name()).
-   * @return Указатель на шаг или nullptr если не найден.
-   *
-   * Используется в тестах (например, AntennaProcessorTest) для прямого
-   * вызова конкретного шага без перестройки pipeline'а.
-   *   @test_check (result == nullptr) || (std::strcmp(result->Name(), name) == 0)
+/**
+   * @brief Найти шаг по Name() (линейный O(N) поиск).
+   * @param name Имя шага (как возвращает IPipelineStep::Name()).
+   * @return Указатель на шаг или nullptr если не найден.
+   *
+   * Используется в тестах (например, AntennaProcessorTest) для прямого
+   * вызова конкретного шага без перестройки pipeline'а.
+   *   @test_check (result == nullptr) || (std::strcmp(result->Name(), name) == 0)
    */
 ```
 

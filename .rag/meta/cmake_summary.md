@@ -41,9 +41,9 @@ target_link_libraries(DspStrategies PUBLIC
 
 ```cmake
 target_sources(DspStrategies PRIVATE
-  src/strategies/src/antenna_processor_v1.cpp
-  src/strategies/src/weight_generator.cpp
-  src/strategies/src/strategies_float_api.cpp
+  src/strategies/antenna_processor_v1.cpp
+  src/strategies/weight_generator.cpp
+  src/strategies/strategies_float_api.cpp
 )
 ```
 
@@ -60,9 +60,9 @@ fetch_dsp_stats()
 find_package(hip    REQUIRED)
 find_package(hipblas REQUIRED)
 roc::hipblas
-src/strategies/src/antenna_processor_v1.cpp
-src/strategies/src/strategies_float_api.cpp
-src/strategies/src/weight_generator.cpp
+src/strategies/antenna_processor_v1.cpp
+src/strategies/strategies_float_api.cpp
+src/strategies/weight_generator.cpp
 target_compile_definitions(<TARGET> PUBLIC ENABLE_ROCBLAS=1)
 target_link_libraries(<TARGET>
 ```

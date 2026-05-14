@@ -9,37 +9,31 @@ uses_external: ['numpy']
 has_test_runner: false
 is_opencl: false
 line_count: 95
-title: Тест биндингов strategies
-tags: []
+title: Strategies
+tags: ['strategies', 'python_test']
 uses_pybind:
   - dsp_strategies.ROCmGPUContext
   - dsp_strategies.AntennaProcessorTest
 top_functions:
   - check
-synonyms_ru:
-  - тест биндингов
-  - тест strategies
-  - тест rocm
-  - тест python
-  - тест gpu
 inherits_block_id: strategies__rocm_gpu_context__class_overview__v1
 block_refs:
   - strategies__rocm_gpu_context__class_overview__v1
-ai_generated: false
+ai_generated: true
 human_verified: false
 ---
 
 <!-- rag-block: id=dsp__strategies_strategies__python_test_usecase__v1 -->
 
-# Python use-case: Тест биндингов strategies
+# Python use-case: Strategies
 
 ## Цель
 
-Проверка корректности Python-биндингов strategies для ROCm.
+Standalone test for dsp_strategies Python bindings (ROCm).
 
 ## Когда применять
 
-Запускать после изменений в биндингах или ROCm-контексте.
+Standalone test for dsp_strategies Python bindings (ROCm).
 
 ## Используемые pybind-классы
 

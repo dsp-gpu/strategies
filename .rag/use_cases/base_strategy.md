@@ -3,47 +3,38 @@ schema_version: 1
 kind: use_case
 id: base_strategy
 repo: strategies
-title: "Как протестировать базовую стратегию обработки сигналов на GPU"
+title: "Base Strategy"
 synonyms:
   ru:
-    - "тестирование базовой стратегии"
-    - "проверка обработки сигналов"
-    - "тестирование стратегии обработки"
-    - "тестирование pipeline"
-    - "тестирование AntennaProcessor"
-    - "проверка стратегии на GPU"
-    - "тестирование шаблона обработки"
-    - "тестирование стратегии сигналов"
+    - []
   en:
-    - "test base strategy"
-    - "signal processing strategy test"
-    - "antenna processor test"
-    - "strategy pipeline testing"
-    - "gpu strategy testing"
-    - "base strategy validation"
-    - "signal processing validation"
-    - "strategy template testing"
+    - []
 primary_class: test_strategies::BaseStrategyTest
 primary_method: GetName
 related_classes:
+  - strategies::statistics_processor
+  - strategies::all_maxima_pipeline_rocm
+  - strategies::antenna_processor
+  - spectrum::fft_processor_rocm
+  - strategies::antenna_processor_v1
 related_use_cases:
-  - core__zero_copy__usecase__v1
-  - heterodyne__heterodyne_basic__usecase__v1
-  - linalg__capon_rocm__usecase__v1
+  - spectrum__fir_basic__usecase__v1
+  - radar__range_angle_basic__usecase__v1
+  - radar__fm_basic__usecase__v1
 maturity: stable
 language: cpp
-tags: [strategies, testing, strategy, signal_processing, gpu, pipeline, antenna, validation, base, template]
-ai_generated: true
+tags: []
+ai_generated: false
 human_verified: false
-operator: ai
-updated_at: 2026-05-06
+operator: alex
+updated_at: 2026-05-13
 ---
 
-# Use-case: Как протестировать базовую стратегию обработки сигналов на GPU
+# Use-case: Base Strategy
 
 ## Когда применять
 
-Когда нужно создать тест для пользовательской стратегии обработки сигналов, используя готовый шаблон полного pipeline
+_LLM-fallback: см. описание класса._
 
 ## Решение
 
@@ -57,10 +48,10 @@ _Не определены (нет `@throws` в Doxygen primary_method)._
 
 ## Что делать дальше
 
-- См. [core__zero_copy__usecase__v1](./zero_copy.md)
-- См. [heterodyne__heterodyne_basic__usecase__v1](./heterodyne_basic.md)
-- См. [linalg__capon_rocm__usecase__v1](./capon_rocm.md)
+- См. [spectrum__fir_basic__usecase__v1](./fir_basic.md)
+- См. [radar__range_angle_basic__usecase__v1](./range_angle_basic.md)
+- См. [radar__fm_basic__usecase__v1](./fm_basic.md)
 
 ## Ссылки
 
-- Источник кода: `E:/DSP-GPU/strategies/tests/test_base_strategy.hpp:1`
+- Источник кода: `/home/alex/DSP-GPU/strategies/tests/test_base_strategy.hpp:1`

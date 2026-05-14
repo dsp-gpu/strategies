@@ -1,18 +1,15 @@
-﻿---
+---
 schema_version: 1
 repo: strategies
 class_fqn: dsp::strategies::AntennaProcessor_v1
-file: E:/DSP-GPU/strategies/include/strategies/antenna_processor_v1.hpp
-line: 50
-brief: "Обрабатывает сигналы с использованием GPU-потоков и событий для параллельной обработки данных."
+file: /home/alex/DSP-GPU/strategies/include/dsp/strategies/antenna_processor_v1.hpp
+line: 103
+brief: "/**  * @class AntennaProcessor_v1  * @brief ROCm-реализация AntennaProcessor: GEMM + Window+FFT + post-FFT сценарии.  *  * @note Move/copy запрещены — owns hipBLAS handle + hipFFT plan + 7 streams + G"
 methods_total: 3
 methods_with_doxygen: 3
-ai_generated: true
+ai_generated: false
 human_verified: false
-parser_version: 2
-synonyms_ru: ['Обработка антенн', 'GPU-обработка сигналов', 'Стратегия обработки', 'Потоковая обработка']
-synonyms_en: ['Antenna Processing', 'GPU Signal Processing', 'Strategy Pattern', 'Stream Processing']
-tags: ['GPU', 'HIP', 'Parallel Processing', 'Antennas', 'Strategies']
+parser_version: 1
 ---
 
 # `dsp::strategies::AntennaProcessor_v1` — карточка класса
@@ -27,26 +24,19 @@ tags: ['GPU', 'HIP', 'Parallel Processing', 'Antennas', 'Strategies']
 
 <!-- rag-block: id=strategies__antenna_processor_v1__class_overview__v1 -->
 
-**ЧТО**: Обрабатывает сигналы с использованием GPU-потоков и событий для параллельной обработки данных.
-
-**ЗАЧЕМ**: Решает проблему последовательной обработки сигналов на CPU, обеспечивая высокую пропускную способность через асинхронные операции копирования и вычисления.
-
-**КАК**: Использует HIP-потоки для асинхронной обработки, события для синхронизации, кэширование конфигурации, поддержку chunked VRAM-копирований и интеграцию с WelfordAccum для статистики.
-
-**Пример**:
-```cpp
-#include "dsp/strategies/antenna_processor_v1.hpp"
-using namespace dsp::strategies;
-
-int main() {
-    AntennaProcessor_v1 processor;
-    void* d_S = ...;
-    void* d_W = ...;
-    auto result = processor.process(d_S, d_W);
-    std::cout << "GPU ID: " << processor.gpu_id() << std::endl;
-    return 0;
-}
-```
+/**
+ * @class AntennaProcessor_v1
+ * @brief ROCm-реализация AntennaProcessor: GEMM + Window+FFT + post-FFT сценарии.
+ *
+ * @note Move/copy запрещены — owns hipBLAS handle + hipFFT plan + 7 streams + GPU buffers.
+ * @note Требует #if ENABLE_ROCM. На non-ROCm сборках большая часть кода скрыта макросом.
+ * @note Lifecycle: ctor(backend, cfg) → (опц.) set_external_weights → process / step_* → dtor.
+ * @note Не thread-safe. Один экземпляр = один владелец GPU-ресурсов.
+ * @see AntennaProcessor — родительский Strategy-интерфейс
+ * @see AntennaProcessorTest — наследник со step-by-step API для тестов
+ * @see ICheckpointSave — стратегия checkpoint-сохранения (default = NullCheckpointSave)
+ * @ingroup grp_strategies
+ */
 
 <!-- /rag-block -->
 
@@ -62,7 +52,7 @@ int main() {
 
 ## Method 1: `process`
 
-**Сигнатура** (`antenna_processor_v1.hpp:126`):
+**Сигнатура** (`antenna_processor_v1.hpp:127`):
 ```cpp
 AntennaResult process(const void* d_S, const void* d_W) override
 ```
@@ -75,22 +65,22 @@ AntennaResult process(const void* d_S, const void* d_W) override
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Запускает полный pipeline (Pipeline::Execute) на входе d_S/d_W; возвращает агрегированный результат.
-   *
-   * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU.
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
-   * @param d_W Матрица весов [n_ant × n_ant] complex<float> на GPU.
-   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
-   *
-   * @return Результат: статистики, пики (по сценарию), MinMax, метрики производительности.
-   *   @test_check result.success == true
+/**
+   * @brief Запускает полный pipeline (Pipeline::Execute) на входе d_S/d_W; возвращает агрегированный результат.
+   *
+   * @param d_S Входной сигнал [n_ant × n_samples] complex<float> на GPU.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
+   * @param d_W Матрица весов [n_ant × n_ant] complex<float> на GPU.
+   *   @test { pattern=gpu_pointer, values=["valid_alloc", nullptr], error_values=[0xDEADBEEF, null] }
+   *
+   * @return Результат: статистики, пики (по сценарию), MinMax, метрики производительности.
+   *   @test_check result.success == true
    */
 ```
 
 ## Method 2: `config`
 
-**Сигнатура** (`antenna_processor_v1.hpp:140`):
+**Сигнатура** (`antenna_processor_v1.hpp:141`):
 ```cpp
 const AntennaProcessorConfig& config() const override { return cfg_;
 ```
@@ -99,17 +89,17 @@ const AntennaProcessorConfig& config() const override { return cfg_;
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Возвращает текущий конфиг pipeline'а (read-only).
-   *
-   * @return Const-ссылка на хранимый AntennaProcessorConfig.
-   *   @test_check result.n_ant > 0 && result.n_samples > 0
+/**
+   * @brief Возвращает текущий конфиг pipeline'а (read-only).
+   *
+   * @return Const-ссылка на хранимый AntennaProcessorConfig.
+   *   @test_check result.n_ant > 0 && result.n_samples > 0
    */
 ```
 
 ## Method 3: `gpu_id`
 
-**Сигнатура** (`antenna_processor_v1.hpp:147`):
+**Сигнатура** (`antenna_processor_v1.hpp:148`):
 ```cpp
 int gpu_id() const override
 ```
@@ -118,11 +108,11 @@ int gpu_id() const override
 
 **Doxygen-источник**:
 ```cpp
-/**
-   * @brief Возвращает идентификатор GPU, на котором работает процессор.
-   *
-   * @return GPU id (0..GetDeviceCount()-1).
-   *   @test_check result >= 0
+/**
+   * @brief Возвращает идентификатор GPU, на котором работает процессор.
+   *
+   * @return GPU id (0..GetDeviceCount()-1).
+   *   @test_check result >= 0
    */
 ```
 
