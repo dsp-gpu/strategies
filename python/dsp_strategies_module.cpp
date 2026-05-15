@@ -14,10 +14,8 @@
 
 #include "py_helpers.hpp"
 
-#if ENABLE_ROCM
 #include "py_gpu_context.hpp"
 #include "py_strategies_rocm.hpp"
-#endif
 
 PYBIND11_MODULE(dsp_strategies, m) {
     m.doc() = "dsp::strategies — full antenna processing pipeline (ROCm)\n\n"
@@ -26,10 +24,8 @@ PYBIND11_MODULE(dsp_strategies, m) {
               "  AntennaProcessorTest - full antenna array pipeline (ROCm)\n"
               "  WeightGenerator      - adaptive weight generator (ROCm)\n";
 
-#if ENABLE_ROCM
     // ROCmGPUContext зарегистрирован в dsp_core (один раз глобально).
     py::module_::import("dsp_core");
 
     register_strategies_rocm(m);
-#endif
 }

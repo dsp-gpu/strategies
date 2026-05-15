@@ -48,7 +48,6 @@
 //   - Создан: 2026-03-14 (Ref03-C, фьюжен трёх старых шагов в один)
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <dsp/strategies/i_pipeline_step.hpp>
 #include <dsp/strategies/pipeline_context.hpp>
@@ -155,4 +154,3 @@ private:
 
 } // namespace dsp::strategies
 
-#endif  // ENABLE_ROCM

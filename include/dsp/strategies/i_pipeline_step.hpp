@@ -48,7 +48,6 @@
 //   - Создан: 2026-03-14 (Ref03-C, разделение IGpuOperation и IPipelineStep)
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <core/interface/i_gpu_operation.hpp>
 
@@ -113,4 +112,3 @@ public:
 
 } // namespace dsp::strategies
 
-#endif  // ENABLE_ROCM

@@ -25,7 +25,6 @@
  *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
-#if ENABLE_ROCM
 
 namespace dsp::strategies {
 namespace kernels {
@@ -308,4 +307,3 @@ void one_max_no_phase(
 }  // namespace kernels
 } // namespace dsp::strategies
 
-#endif  // ENABLE_ROCM

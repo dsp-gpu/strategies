@@ -21,7 +21,6 @@
  * @note Не публичный API. Используется внутри tests/strategies.
  */
 
-#if ENABLE_ROCM
 
 #include "i_signal_strategy.hpp"
 #include "signal_strategies.hpp"
@@ -68,4 +67,3 @@ public:
 
 }  // namespace test_strategies
 
-#endif  // ENABLE_ROCM

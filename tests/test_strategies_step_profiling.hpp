@@ -21,7 +21,6 @@
  * @note Не публичный API. Подключается при необходимости профилирования.
  */
 
-#if ENABLE_ROCM
 
 #include <algorithm>
 #include <chrono>
@@ -238,4 +237,3 @@ inline void run_step_profiling(drv_gpu_lib::IBackend* backend) {
 
 }  // namespace test_strategies_profiling
 
-#endif  // ENABLE_ROCM

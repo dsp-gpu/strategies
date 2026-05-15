@@ -21,7 +21,6 @@
  * @note Не публичный API. Подключается через all_test.hpp.
  */
 
-#if ENABLE_ROCM
 
 #include "base_strategy_test.hpp"
 #include "signal_strategy_factory.hpp"
@@ -114,4 +113,3 @@ inline void run_sin_only(drv_gpu_lib::IBackend* backend) {
 
 }  // namespace test_base_strategy
 
-#endif  // ENABLE_ROCM

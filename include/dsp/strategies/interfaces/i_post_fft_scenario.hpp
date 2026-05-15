@@ -51,9 +51,7 @@
 
 #include <cstdint>
 
-#if ENABLE_ROCM
 #include <hip/hip_runtime.h>
-#endif
 
 namespace dsp::strategies {
 
@@ -71,7 +69,6 @@ class IPostFftScenario {
 public:
   virtual ~IPostFftScenario() = default;
 
-#if ENABLE_ROCM
   /**
    * @brief Запустить post-FFT сценарий над уже посчитанным спектром.
    * @param d_spectrum   Complex-float спектр [n_ant × nFFT] на GPU.
@@ -90,7 +87,6 @@ public:
       float    sample_rate,
       uint32_t maxima_limit,
       hipStream_t stream) = 0;
-#endif
 
   /**
    * @brief Возвращает человекочитаемое имя сценария (для профайлера и логов).

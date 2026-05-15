@@ -41,7 +41,6 @@
 //   - Создан: 2026-03-14 (Ref03-C, выделено из AntennaProcessor::process_gemm)
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <dsp/strategies/i_pipeline_step.hpp>
 #include <dsp/strategies/pipeline_context.hpp>
@@ -117,4 +116,3 @@ public:
 
 } // namespace dsp::strategies
 
-#endif  // ENABLE_ROCM

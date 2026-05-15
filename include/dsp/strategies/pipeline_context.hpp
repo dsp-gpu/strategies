@@ -16,7 +16,6 @@
  *   - Изменён: 2026-05-01 (унификация формата шапки под dsp-asst RAG-индексер)
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/strategies/config/antenna_processor_config.hpp>
 #include <dsp/strategies/result_types.hpp>
@@ -121,4 +120,3 @@ struct PipelineContext {
 
 } // namespace dsp::strategies
 
-#endif  // ENABLE_ROCM

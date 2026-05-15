@@ -21,7 +21,6 @@
  * @note Не публичный API. Подключается через all_test.hpp.
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/strategies/antenna_processor_test.hpp>
 #include <dsp/strategies/weight_generator.hpp>
@@ -272,4 +271,3 @@ inline void test_external_weights(drv_gpu_lib::IBackend* backend) {
 
 }  // namespace test_strategies
 
-#endif  // ENABLE_ROCM

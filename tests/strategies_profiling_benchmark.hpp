@@ -22,7 +22,6 @@
  * @note Не публичный API. Запускается отдельно (не в CI).
  */
 
-#if ENABLE_ROCM
 
 #include "strategy_test_base.hpp"
 #include <dsp/strategies/antenna_processor_test.hpp>
@@ -217,4 +216,3 @@ private:
 
 }  // namespace test_strategies
 
-#endif  // ENABLE_ROCM

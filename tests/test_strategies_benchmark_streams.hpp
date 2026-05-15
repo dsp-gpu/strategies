@@ -20,7 +20,6 @@
  * @note Не публичный API. Подключается через all_test.hpp.
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/strategies/antenna_processor_test.hpp>
 #include <core/services/console_output.hpp>
@@ -158,4 +157,3 @@ inline void run_benchmark_streams(drv_gpu_lib::IBackend* backend) {
 
 }  // namespace test_strategies_benchmark_streams
 
-#endif  // ENABLE_ROCM

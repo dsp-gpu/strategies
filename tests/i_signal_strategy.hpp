@@ -20,7 +20,6 @@
  * @note Не публичный API. Реализации — в signal_strategies.hpp.
  */
 
-#if ENABLE_ROCM
 
 #include "antenna_test_params.hpp"
 
@@ -87,4 +86,3 @@ public:
 
 }  // namespace test_strategies
 
-#endif  // ENABLE_ROCM

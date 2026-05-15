@@ -23,7 +23,6 @@
  * @note Не публичный API. Создаются через SignalStrategyFactory.
  */
 
-#if ENABLE_ROCM
 
 #include "i_signal_strategy.hpp"
 #include "antenna_test_params.hpp"
@@ -180,4 +179,3 @@ public:
 
 }  // namespace test_strategies
 
-#endif  // ENABLE_ROCM

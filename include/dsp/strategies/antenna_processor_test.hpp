@@ -103,9 +103,7 @@ public:
   AntennaResult step_1_debug_input() {
     AntennaResult result;
     do_debug_point_21(d_S_, result);
-#if ENABLE_ROCM
     hipStreamSynchronize(nullptr);  // Ensure stats complete
-#endif
     return result;
   }
 
@@ -116,9 +114,7 @@ public:
    */
   std::vector<std::complex<float>> step_2_gemm() {
     do_gemm(d_S_, d_W_);
-#if ENABLE_ROCM
     hipDeviceSynchronize();
-#endif
     return copy_buffer_to_cpu(get_d_X(),
         config().n_ant * config().n_samples);
   }
@@ -131,9 +127,7 @@ public:
   AntennaResult step_3_debug_post_gemm() {
     AntennaResult result;
     do_debug_point_22(result);
-#if ENABLE_ROCM
     hipDeviceSynchronize();
-#endif
     return result;
   }
 
@@ -144,9 +138,7 @@ public:
    */
   std::vector<std::complex<float>> step_4_window_fft() {
     do_window_fft();
-#if ENABLE_ROCM
     hipDeviceSynchronize();
-#endif
     return copy_buffer_to_cpu(get_d_spectrum(),
         config().n_ant * get_nFFT());
   }
@@ -159,9 +151,7 @@ public:
   AntennaResult step_5_debug_post_fft() {
     AntennaResult result;
     do_debug_point_23(result);
-#if ENABLE_ROCM
     hipDeviceSynchronize();
-#endif
     return result;
   }
 
@@ -261,11 +251,9 @@ private:
       const void* d_buf, size_t num_complex_elements)
   {
     std::vector<std::complex<float>> host(num_complex_elements);
-#if ENABLE_ROCM
     hipMemcpy(host.data(), d_buf,
               num_complex_elements * sizeof(std::complex<float>),
               hipMemcpyDeviceToHost);
-#endif
     return host;
   }
 };

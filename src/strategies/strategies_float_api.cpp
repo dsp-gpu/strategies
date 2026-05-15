@@ -10,7 +10,6 @@
  * @date 2026-04-22
  */
 
-#if ENABLE_ROCM
 
 #include <dsp/strategies/strategies_float_api.hpp>
 #include <dsp/strategies/kernels/strategies_kernels_rocm.hpp>
@@ -219,4 +218,3 @@ std::vector<MinMaxResult> StrategiesFloatApi::GlobalMinMaxFromFloat(
 
 } // namespace dsp::strategies
 
-#endif  // ENABLE_ROCM

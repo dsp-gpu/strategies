@@ -22,7 +22,6 @@
  * @note Не публичный API. Запускается через test_base_strategy.hpp и др.
  */
 
-#if ENABLE_ROCM
 
 #include "antenna_test_params.hpp"
 #include "i_signal_strategy.hpp"
@@ -203,4 +202,3 @@ private:
 
 }  // namespace test_strategies
 
-#endif  // ENABLE_ROCM

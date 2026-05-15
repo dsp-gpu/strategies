@@ -5,7 +5,6 @@
 using drv_gpu_lib::ScopedHipEvent;
 
 
-#if ENABLE_ROCM
 #include <dsp/stats/statistics_processor.hpp>
 #include <dsp/spectrum/pipelines/all_maxima_pipeline_rocm.hpp>
 #include <dsp/spectrum/complex_to_mag_phase_rocm.hpp>
@@ -552,41 +551,3 @@ void AntennaProcessor_v1::do_run_post_fft_parallel(AntennaResult& result) {
 
 } // namespace dsp::strategies
 
-#else  // !ENABLE_ROCM
-
-// ============================================================================
-// Stub for non-ROCm builds (Windows)
-// ============================================================================
-
-namespace dsp::strategies {
-
-AntennaProcessor_v1::AntennaProcessor_v1(
-    drv_gpu_lib::IBackend* backend,
-    const AntennaProcessorConfig& cfg)
-    : backend_(backend), cfg_(cfg)
-{
-  checkpoint_ = std::make_unique<NullCheckpointSave>();
-}
-
-AntennaProcessor_v1::~AntennaProcessor_v1() = default;
-
-int AntennaProcessor_v1::gpu_id() const { return -1; }
-
-void AntennaProcessor_v1::set_checkpoint_save(std::unique_ptr<ICheckpointSave> save) {
-  checkpoint_ = std::move(save);
-}
-
-AntennaResult AntennaProcessor_v1::process(const void*, const void*) {
-  throw std::runtime_error("AntennaProcessor_v1: ROCm not enabled");
-}
-
-void AntennaProcessor_v1::do_debug_point_21(const void*, AntennaResult&) {}
-void AntennaProcessor_v1::do_gemm(const void*, const void*) {}
-void AntennaProcessor_v1::do_debug_point_22(AntennaResult&) {}
-void AntennaProcessor_v1::do_window_fft() {}
-void AntennaProcessor_v1::do_debug_point_23(AntennaResult&) {}
-void AntennaProcessor_v1::do_run_post_fft_scenarios(AntennaResult&) {}
-
-} // namespace dsp::strategies
-
-#endif  // ENABLE_ROCM

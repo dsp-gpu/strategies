@@ -67,13 +67,11 @@
 #include <dsp/strategies/interfaces/i_post_fft_scenario.hpp>
 #include <dsp/strategies/checkpoint/null_checkpoint_save.hpp>
 
-#if ENABLE_ROCM
 #include <core/interface/gpu_context.hpp>
 #include <hip/hip_runtime.h>
 #include <core/services/scoped_hip_event.hpp>
 #include <hipblas/hipblas.h>
 #include <hipfft/hipfft.h>
-#endif
 
 #include <memory>
 #include <vector>
@@ -190,7 +188,6 @@ private:
   drv_gpu_lib::IBackend* backend_ = nullptr;
   AntennaProcessorConfig cfg_;
 
-#if ENABLE_ROCM
   // Ref03: GpuContext for kernel compilation (replaces manual hiprtc + KernelCacheService)
   drv_gpu_lib::GpuContext ctx_;
   bool compiled_ = false;
@@ -225,7 +222,6 @@ private:
   void* d_hamming_window_ = nullptr;
   void* d_one_max_results_ = nullptr;
   void* d_minmax_results_  = nullptr;
-#endif
 
   // Externally supplied weight matrix (managed GPU buffer — freed by release_buffers)
   void* d_W_managed_ = nullptr;

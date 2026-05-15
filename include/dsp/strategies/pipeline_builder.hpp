@@ -46,7 +46,6 @@
 //   - Создан: 2026-03-14 (Ref03-C, GoF Builder для Pipeline)
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <dsp/strategies/pipeline.hpp>
 
@@ -148,4 +147,3 @@ private:
 
 } // namespace dsp::strategies
 
-#endif  // ENABLE_ROCM

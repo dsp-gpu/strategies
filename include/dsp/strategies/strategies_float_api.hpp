@@ -49,7 +49,6 @@
 //                          ранее: 2026-04-22 — split на .hpp/.cpp, GpuContext, Phase C4)
 // ============================================================================
 
-#if ENABLE_ROCM
 
 #include <dsp/strategies/result_types.hpp>
 #include <core/interface/i_backend.hpp>
@@ -163,4 +162,3 @@ private:
 
 } // namespace dsp::strategies
 
-#endif  // ENABLE_ROCM

@@ -19,7 +19,6 @@
  * @note Не публичный API. Подключается при необходимости отладки.
  */
 
-#if ENABLE_ROCM
 
 #include "debug_step_test.hpp"
 #include "signal_strategy_factory.hpp"
@@ -83,4 +82,3 @@ inline void run_with_save(drv_gpu_lib::IBackend* backend,
 
 }  // namespace test_debug_steps
 
-#endif  // ENABLE_ROCM

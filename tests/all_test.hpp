@@ -30,14 +30,11 @@
 // #include "strategies_profiling_benchmark.hpp"  // включить отдельно если нужно
 // #include "timing_per_step_test.hpp"             // включить отдельно если нужно
 
-#if ENABLE_ROCM
 #include <core/backends/rocm/rocm_backend.hpp>
 #include <core/services/console_output.hpp>
-#endif
 
 namespace strategies_all_test {
 
-#if ENABLE_ROCM
 
 inline drv_gpu_lib::IBackend* GetTestBackend() {
   static drv_gpu_lib::ROCmBackend backend;
@@ -47,10 +44,8 @@ inline drv_gpu_lib::IBackend* GetTestBackend() {
   return &backend;
 }
 
-#endif  // ENABLE_ROCM
 
 inline void run() {
-#if ENABLE_ROCM
   auto& con = drv_gpu_lib::ConsoleOutput::GetInstance();
   if (!con.IsRunning()) con.Start();
   int gpu_id = 0;
@@ -74,7 +69,6 @@ inline void run() {
   con.Print(gpu_id, "Strategies", "════════════════════════════════════════════════════════════");
   con.Print(gpu_id, "Strategies", " All Strategies tests PASSED ✅");
   con.Print(gpu_id, "Strategies", "════════════════════════════════════════════════════════════");
-#endif
 }
 
 }  // namespace strategies_all_test
