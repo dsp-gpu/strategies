@@ -27,7 +27,7 @@
 //         - hipStream_t в API → caller контролирует параллельность:
 //           AntennaProcessor_v1 запускает 3 сценария на 3 разных streams
 //           (do_run_post_fft_parallel) для overlap.
-//         - #if ENABLE_ROCM на execute() — non-ROCm сборка получает только
+//         - ROCm-only execute() — без guard-ов в headers
 //           name() (для тестов компиляции). Без HIP-зависимостей в API.
 //         - name() const char* — лёгкий для логов/профайлера, без
 //           аллокаций std::string.

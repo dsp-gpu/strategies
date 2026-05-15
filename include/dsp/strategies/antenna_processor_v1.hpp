@@ -90,7 +90,6 @@ namespace dsp::strategies {
  * @brief ROCm-реализация AntennaProcessor: GEMM + Window+FFT + post-FFT сценарии.
  *
  * @note Move/copy запрещены — owns hipBLAS handle + hipFFT plan + 7 streams + GPU buffers.
- * @note Требует #if ENABLE_ROCM. На non-ROCm сборках большая часть кода скрыта макросом.
  * @note Lifecycle: ctor(backend, cfg) → (опц.) set_external_weights → process / step_* → dtor.
  * @note Не thread-safe. Один экземпляр = один владелец GPU-ресурсов.
  * @see AntennaProcessor — родительский Strategy-интерфейс

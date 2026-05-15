@@ -31,7 +31,7 @@
 //           тащим тяжёлый <core/interface/gpu_context.hpp> в header.
 //         - persistent stream_ + persistent kernel handles → между
 //           вызовами Free's и Compile's нет, только H2D/D2H буфера.
-//         - #if ENABLE_ROCM на весь header — на non-ROCm сборках класс
+//         - ROCm-only — класс
 //           недоступен (нет stub'а). Caller'ы строят с тем же гардом.
 //         - Phase C4 рефакторинг (2026-04-22): был 337-строчный header-inline,
 //           разбили на .hpp/.cpp + delegated kernel-compile в GpuContext.
@@ -71,7 +71,6 @@ namespace dsp::strategies {
  * @brief Standalone post-FFT вычисления из CPU std::vector<float> магнитуд.
  *
  * @note Move/copy запрещены — owns GpuContext + kernel handles + AllMaximaPipelineROCm.
- * @note Только ROCm (#if ENABLE_ROCM). На non-ROCm сборках класс недоступен.
  * @note Каждый метод: hipMalloc → H2D → kernel → D2H → hipFree (нет persistent GPU state).
  * @note Kernel'ы компилируются один раз в ctor через GpuContext (disk-cached HSACO).
  * @see GpuContext — Ref03 Layer 1, kernel compile/cache
