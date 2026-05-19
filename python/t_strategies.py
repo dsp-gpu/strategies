@@ -20,6 +20,17 @@ build_python = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 if os.path.isdir(build_python):
     sys.path.insert(0, build_python)
 
+# Fallback: DSP/Python/libs/ (центральная папка со всеми .so)
+_DSP_PY = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                         "..", "..", "DSP", "Python"))
+if _DSP_PY not in sys.path:
+    sys.path.insert(0, _DSP_PY)
+try:
+    from common.gpu_loader import GPULoader
+    GPULoader.setup_path()
+except ImportError:
+    pass
+
 passed = 0
 failed = 0
 
@@ -47,7 +58,8 @@ except ImportError as e:
 
 # ── Test 2: ROCmGPUContext ──────────────────────────────────────────
 try:
-    ctx = dsp_strategies.ROCmGPUContext(0)
+    import dsp_core
+    ctx = dsp_core.ROCmGPUContext(0)
     check("ROCmGPUContext(0)", True, f"device={ctx.device_name}")
 except Exception as e:
     check("ROCmGPUContext(0)", False, str(e))
