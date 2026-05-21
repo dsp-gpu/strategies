@@ -3,6 +3,8 @@ build/
 *.so
 __pycache__/
 .cache/
-# Runtime artifacts из Python тестов (kernel cache + per-GPU логи)
+# Runtime artifacts (kernel cache + per-GPU логи) — Python И C++
 python/Logs/
 python/modules/
+Logs/
+modules/

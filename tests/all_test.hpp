@@ -28,7 +28,7 @@
 #include "test_base_strategy.hpp"
 #include "test_debug_steps.hpp"
 // #include "strategies_profiling_benchmark.hpp"  // включить отдельно если нужно
-// #include "timing_per_step_test.hpp"             // включить отдельно если нужно
+#include "timing_per_step_test.hpp"  // T4 — генерит timing_*.json в Results/strategies/
 
 #include <core/backends/rocm/rocm_backend.hpp>
 #include <core/services/console_output.hpp>
@@ -65,6 +65,16 @@ inline void run() {
   test_base_strategy::run_sin_only(backend);          // T1: быстрый smoke-тест
   // test_base_strategy::run_all_variants(backend);   // T1: все 4 сигнала
   // test_debug_steps::run_all(backend);              // T2: step-by-step debug
+
+  // ── T4: TimingPerStepTest → JSON в DSP/Results/strategies/ ─────────────
+  {
+    auto params = test_strategies::AntennaTestParams::Small();
+    params.output_dir = "../DSP/Results/strategies/";
+    auto sig = test_strategies::SignalStrategyFactory::Create(
+                  test_strategies::SignalVariant::SIN);
+    test_strategies::TimingPerStepTest t4(backend, std::move(sig), params);
+    t4.Run();
+  }
 
   con.Print(gpu_id, "Strategies", "════════════════════════════════════════════════════════════");
   con.Print(gpu_id, "Strategies", " All Strategies tests PASSED ✅");
